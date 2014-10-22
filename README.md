@@ -5,30 +5,6 @@ Author: Sylvain Lefebvre
 Date: 2014-04-14 09:58:25 CEST
 
 
-Table of Contents
-=================
-1 Simizer is a distributed application simulator
-2 Project description
-    2.1 Why a new simulator ?
-    2.2 The simizer project
-    2.3 Simizer Goals:
-3 Using Simizer
-4 The Task API: Writing protocols and simulating apps in Simizer
-    4.1 A Simple API for designing protocols
-        4.1.1 Optimistic policy example
-    4.2 Application example:
-        4.2.1 Modelling a weather map interpolation application
-5 Developments
-    5.1 Task API
-        5.1.1 Generic Request / Response / send One Way system
-        5.1.2 More complex protocols will require DSL or byte code manipulation
-    5.2 Network Simulation
-        5.2.1 For accuracy: integration with Cloud Sim (network model)
-    5.3 Misc
-        5.3.1 Cleanup code before pushing to github
-        5.3.2 GUI -> realtime graphing
-
-
 1 Simizer is a distributed application simulator 
 =================================================
 

@@ -15,6 +15,8 @@ import simizer.requests.RequestReceiver;
  * This architecture simulation class keeps track of the timestamps in order to
  * call the actions at the right moment.
  * @author Sylvain Lefebvre
+ * 
+ * comment
  */
 public abstract class Node implements RequestReceiver{
     

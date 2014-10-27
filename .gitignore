@@ -1,0 +1,9 @@
+# Ignore generated files.
+build/
+dist/
+
+# Ignore user-specific files.
+nbproject/private/
+
+# Ignore system files.
+.DS_Store

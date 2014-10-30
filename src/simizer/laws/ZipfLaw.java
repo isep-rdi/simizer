@@ -1,6 +1,6 @@
 package simizer.laws;
 
-import java.util.Random;
+import simizer.utils.StdRandom;
 
 /**
  *
@@ -9,7 +9,6 @@ import java.util.Random;
  */
 public class ZipfLaw extends Law {
 
-  private Random rnd = new Random(System.currentTimeMillis());
   private double skew;
   private double bottom;
   private double[] rankPbb;
@@ -49,14 +48,14 @@ public class ZipfLaw extends Law {
     double friquency;
     double dice;
 
-    rank = rnd.nextInt(nbParams);
+    rank = StdRandom.uniform(nbParams);
     friquency = (1.0d / Math.pow(rank, this.skew)) / this.bottom;
-    dice = rnd.nextDouble();
+    dice = StdRandom.uniform();
 
     while (!(dice < friquency)) {
-      rank = rnd.nextInt(nbParams);
+      rank = StdRandom.uniform(nbParams);
       friquency = (1.0d / Math.pow(rank, this.skew)) / this.bottom;
-      dice = rnd.nextDouble();
+      dice = StdRandom.uniform();
     }
 
     return rank;
@@ -67,7 +66,7 @@ public class ZipfLaw extends Law {
   @Override
   public int nextParam() {
     int rank = 1;
-    double p = rnd.nextDouble();
+    double p = StdRandom.uniform();
     double blow = 0.0, bup = rankPbb[rank - 1];
 
     while ((p < blow || p >= bup) && rank <= nbParams) {

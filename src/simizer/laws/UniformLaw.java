@@ -1,13 +1,11 @@
 package simizer.laws;
 
-import java.util.Random;
+import simizer.utils.StdRandom;
 
 /**
  * A {@code Law} representing a uniform probability distribution.
  */
 public class UniformLaw extends Law {
-
-  private Random ran = new Random(System.currentTimeMillis());
 
   public UniformLaw(int nbparams) {
     super(nbparams);
@@ -20,11 +18,7 @@ public class UniformLaw extends Law {
 
   @Override
   public int nextParam() {
-    int result;
-    do {
-      result = (int) Math.round(nbParams * ran.nextDouble());
-    } while (result < 0 || result >= nbParams);
-    return result;
+    return StdRandom.uniform(nbParams);
   }
 
   public static void main(String[] args) {

@@ -1,6 +1,6 @@
 package simizer.laws;
 
-import java.util.Random;
+import simizer.utils.StdRandom;
 
 /**
  * Gaussian - distributed integer generator. Values are set between 0 and
@@ -12,7 +12,6 @@ import java.util.Random;
  */
 public class GaussianLaw extends Law {
 
-  private Random ran = new Random(System.currentTimeMillis());
   private int mean;
   private double sd;
 
@@ -27,7 +26,7 @@ public class GaussianLaw extends Law {
   public int nextParam() {
     int p;
     do {
-      p = (int) Math.round(ran.nextGaussian() * sd + mean);
+      p = (int) Math.round(StdRandom.gaussian(mean, sd));
     } while (p < 0 || p >= nbParams);
     return p;
   }

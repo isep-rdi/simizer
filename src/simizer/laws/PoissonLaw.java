@@ -1,6 +1,6 @@
 package simizer.laws;
 
-import java.util.Random;
+import simizer.utils.StdRandom;
 
 /**
  *
@@ -8,7 +8,6 @@ import java.util.Random;
  */
 public class PoissonLaw extends Law {
 
-  private Random ran = new Random();
   private double alpha;
 
   public PoissonLaw(int nbParams) {
@@ -36,7 +35,7 @@ public class PoissonLaw extends Law {
       k = 0;
       do {
         k++;
-        p = ran.nextDouble() * p;
+        p = StdRandom.uniform() * p;
       } while (p > l);
     } while (k >= nbParams);
     return k - 1;

@@ -48,7 +48,11 @@ public abstract class Law {
       }
     }
 
-    // set the parameter
+    // make sure that we found a valid constructor before setting the parameter
+    if (lawInstance == null) {
+      throw new NullPointerException("Unable to instantiate Law.");
+    }
+
     if (args.length > 2) {
       lawInstance.setParam(Double.parseDouble(args[2]));
     }

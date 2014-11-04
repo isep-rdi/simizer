@@ -60,11 +60,6 @@ public abstract class Law {
     return lawInstance;
   }
 
-  /** @deprecated */
-  public Law() {
-    this(0);
-  }
-
   /**
    * Initializes an instance of the {@code Law} class.
    *
@@ -73,11 +68,6 @@ public abstract class Law {
    */
   public Law(int numberOfParameters) {
     this.nbParams = numberOfParameters;
-  }
-
-  /** @deprecated */
-  public void setNbParams(int nbParams) {
-    this.nbParams = nbParams;
   }
 
   /**
@@ -98,9 +88,4 @@ public abstract class Law {
    * @return a value in the range {@code [0, nbParams)}
    */
   public abstract int nextParam();
-
-  /** @deprecated */
-  public int nextParam(long time, double... params) {
-    return nextParam();
-  }
 }

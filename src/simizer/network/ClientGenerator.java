@@ -32,7 +32,7 @@ public class ClientGenerator {
         this.nw = nw;
         this.maxUsers = maxUsers;
         this.endSim = endSim;
-        nw.registerEvent(new ArrivalEvent(0L,new Long(arrivalLaw.nextParam()),this));
+        nw.registerEvent(new ArrivalEvent(0L,new Long(arrivalLaw.nextValue()),this));
         
     }
     
@@ -76,7 +76,7 @@ public class ClientGenerator {
                   
                     nw.registerEvent(
                     new ArrivalEvent(timestamp + interval
-                    ,(long) arrivalLaw.nextParam()
+                    ,(long) arrivalLaw.nextValue()
                     , this));
         }
     }

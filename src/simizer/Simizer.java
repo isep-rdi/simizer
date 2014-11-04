@@ -243,7 +243,7 @@ public class Simizer {
         while (nbReq < maxReq) {
             // user arrivals:
             if (totalUsers < nbUsers) {
-                int newUsers = lawMap.get("arrivalLaw").nextParam();
+                int newUsers = lawMap.get("arrivalLaw").nextValue();
                 // ajout des nouveaux utilisateurs
                 for (int i = totalUsers; i < (totalUsers + newUsers); i++) {
                     userTime.put(i, currentTime);
@@ -254,10 +254,10 @@ public class Simizer {
             // new requests
             for (int i = 0; i < userTime.size(); i++) {
                 if (userTime.get(i) <= currentTime) {
-                    Request r = rf.getRequest(userTime.get(i), lawMap.get("requestLaw").nextParam());
+                    Request r = rf.getRequest(userTime.get(i), lawMap.get("requestLaw").nextValue());
                     System.out.println(r.getId() + ";" + r.getArTime() + ";" + r.getTypeId());
                     // schedule next request
-                    userTime.put(i, userTime.get(i) + lawMap.get("thinkTimeLaw").nextParam());
+                    userTime.put(i, userTime.get(i) + lawMap.get("thinkTimeLaw").nextValue());
                     nbReq++;
                 }
             }

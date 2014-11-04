@@ -64,7 +64,7 @@ public class ZipfLaw extends Law {
   // should be faster (less random than nextParam)
 
   @Override
-  public int nextParam() {
+  public int nextValue() {
     int rank = 1;
     double p = StdRandom.uniform();
     double blow = 0.0, bup = rankPbb[rank - 1];
@@ -83,7 +83,7 @@ public class ZipfLaw extends Law {
     long total1 = 0, total2 = 0;
     int p;
     for (int i = 0; i < 10000; i++) {
-      p = zipf.nextParam();
+      p = zipf.nextValue();
       System.out.println(i + ";" + p);
     }
 

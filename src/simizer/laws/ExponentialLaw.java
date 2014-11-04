@@ -31,7 +31,7 @@ public class ExponentialLaw extends Law {
   }
 
   @Override
-  public int nextParam() {
+  public int nextValue() {
     double tmpVal;
     do {
       tmpVal = StdRandom.uniform();
@@ -91,7 +91,7 @@ public class ExponentialLaw extends Law {
     int nbPar = 30;
     ExponentialLaw el = new ExponentialLaw(nbPar, alpha);
     for (int i = 0; i < 10000; i++) {
-      System.out.println(el.nextParam() + ";" + el.nextParam2());
+      System.out.println(el.nextValue() + ";" + el.nextParam2());
     }
   }
 }

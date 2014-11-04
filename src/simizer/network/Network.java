@@ -34,7 +34,7 @@ public class  Network extends EventProducer  {
         this.nodeMap= new TreeMap<>();
     }
     protected long getDelay() {
-        return delayLaw.nextParam();
+        return delayLaw.nextValue();
     }
     public  void send(Node source, Node dest, Request r, long timestamp) {
           //1. create a message and set delay

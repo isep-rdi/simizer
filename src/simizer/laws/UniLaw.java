@@ -20,7 +20,7 @@ public class UniLaw extends Law {
   }
 
   @Override
-  public int nextParam() {
+  public int nextValue() {
     return (int) param;
   }
 }

@@ -17,14 +17,14 @@ public class UniformLaw extends Law {
   }
 
   @Override
-  public int nextParam() {
+  public int nextValue() {
     return StdRandom.uniform(upperBound);
   }
 
   public static void main(String[] args) {
     UniformLaw gl = new UniformLaw(1000);
     for (int i = 0; i < 10000; i++) {
-      System.out.println(gl.nextParam());
+      System.out.println(gl.nextValue());
     }
   }
 }

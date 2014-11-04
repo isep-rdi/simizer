@@ -85,7 +85,7 @@ public class ClientNode extends Node {
      * Starts the client by scheduling its first request at startTime
      */
     public void startClient() {
-        this.endTime = startTime + durationLaw.nextParam();
+        this.endTime = startTime + durationLaw.nextValue();
         scheduleNextRequest(this.startTime);
     }
     
@@ -95,7 +95,7 @@ public class ClientNode extends Node {
      */
     public void reinit(long startTime) {
         this.startTime = startTime;
-        this.endTime = startTime + durationLaw.nextParam();
+        this.endTime = startTime + durationLaw.nextValue();
         scheduleNextRequest(this.startTime);
     }
    
@@ -124,8 +124,8 @@ public class ClientNode extends Node {
     }
 
     private void scheduleNextRequest(long timestamp) {
-            long nextTime = thinkTimeLaw.nextParam();
-            int tplId = requestLaw.nextParam();
+            long nextTime = thinkTimeLaw.nextValue();
+            int tplId = requestLaw.nextValue();
             Request r = requestFact.getRequest(timestamp+nextTime, tplId);
             //r.setAppId(1);
             nw.send(this, serviceAddress, r, timestamp+nextTime);

@@ -23,7 +23,7 @@ public class GaussianLaw extends Law {
   }
 
   @Override
-  public int nextParam() {
+  public int nextValue() {
     int p;
     do {
       p = (int) Math.round(StdRandom.gaussian(mean, sd));
@@ -40,7 +40,7 @@ public class GaussianLaw extends Law {
     GaussianLaw gl = new GaussianLaw(30);
     gl.setParam(7.5);
     for (int i = 0; i < 10000; i++) {
-      System.out.println(gl.nextParam());
+      System.out.println(gl.nextValue());
     }
   }
 }

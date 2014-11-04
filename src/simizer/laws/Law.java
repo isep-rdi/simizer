@@ -10,7 +10,7 @@ import java.lang.reflect.Constructor;
  * {@code Law}s can be defined to provide clients, servers, and the network with
  * non-standard or application-specific behavior.
  * <p>
- * A subclass should override the {@link #nextParam()} method to define its
+ * A subclass should override the {@link #nextValue()} method to define its
  * custom behavior.
  */
 public abstract class Law {
@@ -87,5 +87,5 @@ public abstract class Law {
    *
    * @return a value in the range {@code [0, upperBound)}
    */
-  public abstract int nextParam();
+  public abstract int nextValue();
 }

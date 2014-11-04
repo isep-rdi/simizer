@@ -26,7 +26,7 @@ public class PoissonLaw extends Law {
   }
 
   @Override
-  public int nextParam() {
+  public int nextValue() {
     double l = Math.exp(-alpha);
     double p = 1.0;
 

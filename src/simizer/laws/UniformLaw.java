@@ -7,8 +7,8 @@ import simizer.utils.StdRandom;
  */
 public class UniformLaw extends Law {
 
-  public UniformLaw(int nbparams) {
-    super(nbparams);
+  public UniformLaw(int upperBound) {
+    super(upperBound);
   }
 
   @Override
@@ -18,7 +18,7 @@ public class UniformLaw extends Law {
 
   @Override
   public int nextParam() {
-    return StdRandom.uniform(nbParams);
+    return StdRandom.uniform(upperBound);
   }
 
   public static void main(String[] args) {

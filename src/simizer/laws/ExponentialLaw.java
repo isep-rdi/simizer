@@ -12,14 +12,14 @@ public class ExponentialLaw extends Law {
   protected double dNbParam;
   protected double sum;
 
-  public ExponentialLaw(int nbParams) {
-    super(nbParams);
+  public ExponentialLaw(int upperBound) {
+    super(upperBound);
 
-    this.dNbParam = (double) nbParams;
+    this.dNbParam = (double) upperBound;
   }
 
-  public ExponentialLaw(int nbParams, double alpha) {
-    this(nbParams);
+  public ExponentialLaw(int upperBound, double alpha) {
+    this(upperBound);
 
     setParam(alpha);
   }
@@ -27,7 +27,7 @@ public class ExponentialLaw extends Law {
   @Override
   public void setParam(double par) {
     lambda = 1 / par;
-    sum = getSum(nbParams, lambda);
+    sum = getSum(upperBound, lambda);
   }
 
   @Override
@@ -40,7 +40,7 @@ public class ExponentialLaw extends Law {
     int rank = -1;
     do {
       cumul += expDist(++rank, lambda);
-    } while (cumul < tmpVal && rank < nbParams);
+    } while (cumul < tmpVal && rank < upperBound);
 
     return rank;
   }
@@ -56,7 +56,7 @@ public class ExponentialLaw extends Law {
     int rank = -1;
     do {
       cumul += expDist(++rank, lambda) / sum;
-    } while (cumul < tmpVal && rank < nbParams);
+    } while (cumul < tmpVal && rank < upperBound);
 
     return rank;
   }

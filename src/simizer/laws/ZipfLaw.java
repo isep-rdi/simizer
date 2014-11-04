@@ -13,15 +13,15 @@ public class ZipfLaw extends Law {
   private double bottom;
   private double[] rankPbb;
 
-  public ZipfLaw(int nbParams) {
-    this(nbParams, 1.0);
+  public ZipfLaw(int upperBound) {
+    this(upperBound, 1.0);
   }
 
-  public ZipfLaw(int nbParams, double skew) {
-    super(nbParams);
+  public ZipfLaw(int upperBound, double skew) {
+    super(upperBound);
 
     this.setParam(skew);
-    rankPbb = new double[nbParams];
+    rankPbb = new double[upperBound];
     for (int i = 0; i < rankPbb.length; i++) {
       rankPbb[i] = getProbability(i + 1);
     }
@@ -31,7 +31,7 @@ public class ZipfLaw extends Law {
   public final void setParam(double par) {
     this.skew = par;
     this.bottom = 0;
-    for (int i = 1; i <= nbParams; i++) {
+    for (int i = 1; i <= upperBound; i++) {
       this.bottom += (1 / Math.pow(i, this.skew));
     }
   }
@@ -48,12 +48,12 @@ public class ZipfLaw extends Law {
     double friquency;
     double dice;
 
-    rank = StdRandom.uniform(nbParams);
+    rank = StdRandom.uniform(upperBound);
     friquency = (1.0d / Math.pow(rank, this.skew)) / this.bottom;
     dice = StdRandom.uniform();
 
     while (!(dice < friquency)) {
-      rank = StdRandom.uniform(nbParams);
+      rank = StdRandom.uniform(upperBound);
       friquency = (1.0d / Math.pow(rank, this.skew)) / this.bottom;
       dice = StdRandom.uniform();
     }
@@ -69,7 +69,7 @@ public class ZipfLaw extends Law {
     double p = StdRandom.uniform();
     double blow = 0.0, bup = rankPbb[rank - 1];
 
-    while ((p < blow || p >= bup) && rank <= nbParams) {
+    while ((p < blow || p >= bup) && rank <= upperBound) {
       rank++;
       blow = bup;
       bup += rankPbb[rank - 1];

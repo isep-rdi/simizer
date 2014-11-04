@@ -15,7 +15,7 @@ import java.lang.reflect.Constructor;
  */
 public abstract class Law {
 
-  protected int nbParams;
+  protected int upperBound;
 
   /**
    * Instantiates a {@code Law} subclass from a string representation.
@@ -63,11 +63,11 @@ public abstract class Law {
   /**
    * Initializes an instance of the {@code Law} class.
    *
-   * @param numberOfParameters the number of parameters.  Values produced by the
-   *            law will be in the range {@code [0, numberOfParameters)}.
+   * @param upperBound the number of parameters.  Values produced by the law
+   *          will be in the range {@code [0, numberOfParameters)}.
    */
-  public Law(int numberOfParameters) {
-    this.nbParams = numberOfParameters;
+  public Law(int upperBound) {
+    this.upperBound = upperBound;
   }
 
   /**
@@ -85,7 +85,7 @@ public abstract class Law {
   /**
    * Generates the next random value for this {@code Law}.
    *
-   * @return a value in the range {@code [0, nbParams)}
+   * @return a value in the range {@code [0, upperBound)}
    */
   public abstract int nextParam();
 }

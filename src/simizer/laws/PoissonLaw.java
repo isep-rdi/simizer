@@ -10,12 +10,12 @@ public class PoissonLaw extends Law {
 
   private double alpha;
 
-  public PoissonLaw(int nbParams) {
-    this(nbParams, 1.0);
+  public PoissonLaw(int upperBound) {
+    this(upperBound, 1.0);
   }
 
-  public PoissonLaw(int nbParams, double alpha) {
-    super(nbParams);
+  public PoissonLaw(int upperBound, double alpha) {
+    super(upperBound);
 
     this.alpha = alpha;
   }
@@ -37,7 +37,7 @@ public class PoissonLaw extends Law {
         k++;
         p = StdRandom.uniform() * p;
       } while (p > l);
-    } while (k >= nbParams);
+    } while (k >= upperBound);
     return k - 1;
   }
 }

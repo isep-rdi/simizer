@@ -15,10 +15,10 @@ public class GaussianLaw extends Law {
   private int mean;
   private double sd;
 
-  public GaussianLaw(int nbParams) {
-    super(nbParams);
+  public GaussianLaw(int upperBound) {
+    super(upperBound);
 
-    mean = nbParams / 2;
+    mean = upperBound / 2;
     sd = mean / 2.0D;
   }
 
@@ -27,7 +27,7 @@ public class GaussianLaw extends Law {
     int p;
     do {
       p = (int) Math.round(StdRandom.gaussian(mean, sd));
-    } while (p < 0 || p >= nbParams);
+    } while (p < 0 || p >= upperBound);
     return p;
   }
 

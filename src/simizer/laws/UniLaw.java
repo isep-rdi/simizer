@@ -15,11 +15,6 @@ public class UniLaw extends Law {
   }
 
   @Override
-  public void setParam(double par) {
-
-  }
-
-  @Override
   public int nextValue() {
     return (int) param;
   }

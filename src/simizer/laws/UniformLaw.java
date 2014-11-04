@@ -12,11 +12,6 @@ public class UniformLaw extends Law {
   }
 
   @Override
-  public void setParam(double par) {
-
-  }
-
-  @Override
   public int nextValue() {
     return StdRandom.uniform(upperBound);
   }

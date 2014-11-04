@@ -80,7 +80,7 @@ public abstract class Law {
    *
    * @param parameter change the custom parameter
    */
-  public abstract void setParam(double parameter);
+  public void setParam(double parameter) {};
 
   /**
    * Generates the next random value for this {@code Law}.

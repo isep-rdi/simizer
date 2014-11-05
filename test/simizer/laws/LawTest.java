@@ -5,6 +5,7 @@ import org.junit.*;
 /**
  * Basic tests that should be run on all Law subclasses.
  */
+@Ignore
 public class LawTest {
   protected Law law;
 

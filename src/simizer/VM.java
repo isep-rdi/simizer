@@ -84,7 +84,8 @@ public class VM extends ServerNode implements IEventProducer {
      * There is no guarantee on the applications starting order.
      * @see Application
      */
-    public void startVM() {
+    @Override
+    public void start() {
        initTaskSession();
        for(Application app : idToApp.values())
            app.init();

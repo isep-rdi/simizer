@@ -251,4 +251,7 @@ public class ServerNode extends Node implements IEventProducer, RequestFinisher 
     public void onRequestReceived(Node orig, Request r) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    @Override
+    public void start() {}
 }

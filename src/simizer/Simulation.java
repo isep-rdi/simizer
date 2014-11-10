@@ -1,10 +1,9 @@
 package simizer;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import simizer.event.Channel;
 import simizer.event.EventDispatcher2;
 import simizer.event.IEventProducer;
@@ -17,9 +16,8 @@ import simizer.network.Network;
  */
 public class Simulation {
 
-  private final Map<String, Network> netMap = new HashMap<>();
-  private final Map<Integer, Node> nodeMap = new HashMap<>();
-  private final List<ClientNode> clientList = new LinkedList<>();
+  private final Set<Network> networks = new HashSet<>();
+  private final Map<Integer, Node> nodes = new HashMap<>();
 
   private final Channel eventChannel = new Channel();
   
@@ -46,64 +44,54 @@ public class Simulation {
       throw new Exception("Event Channel not ready!");
     }
 
-    for (Node n : nodeMap.values()) {
-      /**
-       * @TODO quick fix for now, must create a start() method in Node class.
-       */
-
-      if (n instanceof VM) {
-        ((VM) n).startVM();
-      }
-    }
-
-    Iterator<ClientNode> clientIt = clientList.listIterator();
-    while (clientIt.hasNext()) {
-      clientIt.next().startClient();
+    for (Node node : nodes.values()) {
+      node.start();
     }
 
     EventDispatcher2 ed = new EventDispatcher2(eventChannel);
     ed.run();
   }
 
-  /**
-   * Adds the given network to simulation entities
-   *
-   * @param name
-   * @param net
-   */
-  public void addNetwork(String name, Network net) {
-    net.setChannel(eventChannel);
-    netMap.put(name, net);
+  public void addNetwork(Network network) {
+    if (networks.add(network)) {
+      network.setChannel(eventChannel);
+    }
   }
 
-  /**
-   * Adds the node to the simulation by adding it to the specified network. Sets
-   * up the channel for producing events if needed.
-   *
-   * @param n
-   * @param networkName
-   */
-  public void addNodeToNet(Node n, String networkName) {
-    if (!nodeMap.containsKey(n.getId())) {
-      nodeMap.put(n.getId(), n);
-    }
+  public void addNode(Node node) {
+    int id = node.getId();
+    if (!nodes.containsKey(id)) {
+      nodes.put(id, node);
 
-    Network net = netMap.get(networkName);
-    net.putNode(n);
-    n.setNetwork(net);
-    if (n instanceof IEventProducer) {
-      ((IEventProducer) n).setChannel(eventChannel);
+      if (node instanceof IEventProducer) {
+        ((IEventProducer) node).setChannel(eventChannel);
+      }
     }
   }
 
   /**
+   * Adds the specified node to the simulation and specified network.
+   * <p>
+   * If {@code node} or {@code network} has not yet been added to the
+   * simulation, they will first be added to the simulation before creating the
+   * association.
    *
-   * @param cn
+   * @param network the network where this node should submit its events
+   * @param node the node being added to the simulation and network
    */
-  public void addClient(ClientNode cn) {
-    if (!nodeMap.containsKey(cn.getId())) {
-      nodeMap.put(cn.getId(), cn);
+  public void toNetworkAddNode(Network network, Node node) {
+    // make sure that they have both been added
+    addNetwork(network);
+    addNode(node);
+
+    // create the association between the two
+    network.putNode(node);
+    node.setNetwork(network);
+  }
+
+  public void toNetworkAddNodes(Network network, Node ... nodes) {
+    for (Node node : nodes) {
+      toNetworkAddNode(network, node);
     }
-    clientList.add(cn);
   }
 }

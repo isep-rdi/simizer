@@ -84,7 +84,7 @@ public class ClientGenerator {
         
          ClientNode cn = new ClientNode(id, nw,timestamp, frontend);
          nw.putNode(cn);
-         cn.startClient();
+         cn.start();
                 
     }
     

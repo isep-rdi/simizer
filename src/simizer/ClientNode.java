@@ -84,7 +84,8 @@ public class ClientNode extends Node {
     /**
      * Starts the client by scheduling its first request at startTime
      */
-    public void startClient() {
+    @Override
+    public void start() {
         this.endTime = startTime + durationLaw.nextValue();
         scheduleNextRequest(this.startTime);
     }

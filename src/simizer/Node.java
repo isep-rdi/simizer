@@ -44,7 +44,9 @@ public abstract class Node implements RequestReceiver{
     public Network getNetwork() {
         return this.nw;
     }
-    
+
+    public void start() {}
+
     @Override
     public void onRequestReception(long timestamp,Message m) {
         this.clock = timestamp;

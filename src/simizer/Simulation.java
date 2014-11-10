@@ -8,7 +8,6 @@ import java.util.Map;
 import simizer.event.Channel;
 import simizer.event.EventDispatcher2;
 import simizer.event.IEventProducer;
-import simizer.network.ClientGenerator;
 import simizer.network.Network;
 
 /**
@@ -24,7 +23,6 @@ public class Simulation {
 
   private final Channel eventChannel = new Channel();
   
-  private ClientGenerator cg;
   private final long endSim;
 
   /**

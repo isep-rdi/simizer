@@ -14,7 +14,7 @@ public class ProcTask extends Task {
   private long insLeft;
 
   public ProcTask(long nbInstructions, int memSize) {
-    super(null);
+    super();
 
     this.nbInstructions = nbInstructions;
     this.insLeft = nbInstructions;

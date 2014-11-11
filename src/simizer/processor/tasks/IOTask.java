@@ -12,7 +12,7 @@ public abstract class IOTask extends Task {
   private final int sz;
 
   public IOTask(int sz) {
-    super(null);
+    super();
 
     this.sz = sz;
   }

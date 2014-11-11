@@ -19,13 +19,21 @@ public abstract class Task {
   private TaskStatus status = TaskStatus.RUNNING;
 
   /** The {@code TaskSession} containing this task. */
-  private TaskSession ts;
+  private TaskSession ts = null;
 
   /**
-   * Initializes a new Task.
+   * Initializes a new {@code Task}.
+   */
+  public Task() {}
+
+  /**
+   * Initializes a new {@code Task}.
+   *
+   * @deprecated Use {@link #Task()} instead.
    *
    * @param ts the corresponding {@link TaskSession}
    */
+  @Deprecated
   public Task(TaskSession ts) {
     this.ts = ts;
   }

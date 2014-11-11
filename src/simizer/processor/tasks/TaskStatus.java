@@ -1,8 +1,7 @@
 package simizer.processor.tasks;
 
 /**
- *
- * @author isep
+ * Represents the current status of a {@code Task}.
  */
 public enum TaskStatus {
   RUNNING,

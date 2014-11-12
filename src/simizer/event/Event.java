@@ -25,10 +25,6 @@ public abstract class Event<D, T> implements Comparable<Event> {
 
   @Override
   public int compareTo(final Event e) {
-    if (data == e.data && timestamp == e.timestamp && target == e.target) {
-      return 0;
-    }
-
     return Long.compare(timestamp, e.timestamp);
   }
 

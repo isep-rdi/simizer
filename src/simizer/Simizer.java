@@ -13,7 +13,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import simizer.event.Channel;
-import simizer.event.EventDispatcher2;
+import simizer.event.EventDispatcher;
 import simizer.laws.GaussianLaw;
 import simizer.laws.Law;
 import simizer.network.ClientGenerator;
@@ -189,10 +189,10 @@ public class Simizer {
         int nbCores = 1;// Runtime.getRuntime().availableProcessors() +1;
 
         ExecutorService es = Executors.newFixedThreadPool(nbCores);
-        EventDispatcher2[] edArray = new EventDispatcher2[nbCores];
+        EventDispatcher[] edArray = new EventDispatcher[nbCores];
 
         for (int i = 0; i < nbCores; i++) {
-            edArray[i] = new EventDispatcher2(c);
+            edArray[i] = new EventDispatcher(c);
             es.submit(edArray[i]);
         }
 
@@ -345,7 +345,7 @@ public class Simizer {
         lbn.setInsideNetwork(lan);
         lbn.setOutsideNetwork(internet);
 
-        EventDispatcher2 ed = new EventDispatcher2(c);
+        EventDispatcher ed = new EventDispatcher(c);
         Thread simThread = new Thread(ed);
         System.out.println("Starting simulation for " + endSim + " milisecs " + ed.getChannel().size());
         try {

@@ -8,7 +8,7 @@ import java.util.logging.Logger;
  * http://www.ibm.com/developerworks/library/j-jtp0730/index.html
  * @author Sylvain Generic event dispatcher, waiting on the Channel
  */
-public class EventDispatcher2 implements Runnable {
+public class EventDispatcher implements Runnable {
 
   private static int dispatcherCounter = 0;
   private static long WAIT_TIME = 100;
@@ -18,7 +18,7 @@ public class EventDispatcher2 implements Runnable {
   private int evtCounter = 0;
   private long clock = 0;
 
-  public EventDispatcher2(final Channel chan) {
+  public EventDispatcher(final Channel chan) {
     this.number = dispatcherCounter++;
     this.chan = chan;
   }
@@ -34,7 +34,7 @@ public class EventDispatcher2 implements Runnable {
       try {
         e = chan.poll(WAIT_TIME, TimeUnit.MILLISECONDS);
       } catch (InterruptedException ex) {
-        Logger.getLogger(EventDispatcher2.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(EventDispatcher.class.getName()).log(Level.SEVERE, null, ex);
       }
 
       if (e != null) { // in case we wakeup and chan is empty nonetheless

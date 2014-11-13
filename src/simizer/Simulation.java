@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import simizer.event.Channel;
-import simizer.event.EventDispatcher2;
+import simizer.event.EventDispatcher;
 import simizer.event.IEventProducer;
 import simizer.network.Network;
 
@@ -48,7 +48,7 @@ public class Simulation {
       node.start();
     }
 
-    EventDispatcher2 ed = new EventDispatcher2(eventChannel);
+    EventDispatcher ed = new EventDispatcher(eventChannel);
     ed.run();
   }
 

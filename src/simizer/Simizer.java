@@ -201,7 +201,7 @@ public class Simizer {
         while (edArray[0].getChannel().size() > 0) {
             sum = 0;
             for (int i = 0; i < edArray.length; i++) {
-                sum += edArray[i].getEvtCounter();
+                sum += edArray[i].getEventCount();
             }
             try {
                 Thread.sleep(10);
@@ -357,7 +357,7 @@ public class Simizer {
         }
 
 
-        System.out.println("Stopping..." + ed.getEvtCounter() + " " + ServerNode.getHits());
+        System.out.println("Stopping..." + ed.getEventCount() + " " + ServerNode.getHits());
         pol.printAdditionnalStats();
         
     }

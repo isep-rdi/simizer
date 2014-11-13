@@ -30,9 +30,12 @@ public interface IEventProducer {
   public void setChannel(final Channel channel);
 
   /**
-   * Adds an event to the {@code Channel} for this producer.
+   * Schedules an {@code Event} for deliver.
+   * <p>
+   * Passes the event to the system for delivery at the timestamp specified in
+   * the event.
    *
-   * @param event the {@code Event} to add
+   * @param event the {@code Event} to schedule
    */
   public void registerEvent(final Event event);
 

@@ -39,4 +39,16 @@ public interface IEventProducer {
    */
   public void registerEvent(final Event event);
 
+  /**
+   * Cancels a previously-registered event.
+   * <p>
+   * This will cancel and remove an {@link Event} that was added using the
+   * {@link #registerEvent(simizer.event.Event)} method.
+   *
+   * @param event the {@link Event} to remove
+   * @return true if {@code event} was removed, false if it did not exist in the
+   *             {@link Channel}
+   */
+  public boolean cancelEvent(final Event event);
+
 }

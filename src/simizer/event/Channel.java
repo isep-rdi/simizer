@@ -27,4 +27,18 @@ public class Channel extends PriorityBlockingQueue<Event> {
     this.offer(event);
   }
 
+  /**
+   * Cancels a previously-registered event.
+   * <p>
+   * This will cancel and remove an {@link Event} that was added using the
+   * {@link #registerEvent(Event)} method.
+   *
+   * @param event the {@link Event} to remove
+   * @return true if {@code event} was removed, false if it did not exist in
+   *             this {@code Channel}
+   */
+  public boolean cancelEvent(final Event event) {
+    return this.remove(event);
+  }
+
 }

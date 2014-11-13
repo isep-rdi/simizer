@@ -222,10 +222,10 @@ public class ServerNode extends Node implements IEventProducer, RequestFinisher 
 
     }
 
-    public Channel getNodeChannel() {
-        return ep.getOutputChannel();
+    @Override
+    public boolean cancelEvent(Event evt) {
+      return ep.cancelEvent(evt);
     }
-
 
     @Override
     public void setChannel(Channel c) {

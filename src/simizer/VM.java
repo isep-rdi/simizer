@@ -31,7 +31,7 @@ import simizer.storage.StorageElement;
  * 
  * @author slefebvr
  */
-public class VM extends ServerNode implements IEventProducer {
+public class VM extends ServerNode {
     public static double DEFAULT_COST=15.0; // 15 cents
     public static long DEFAULT_MEM_SZ = 1024*1024*1024; // 1 GB
     
@@ -332,21 +332,11 @@ public class VM extends ServerNode implements IEventProducer {
         
     }
     
-    private static EventProducer ep = new EventProducer(); // delegate for IEventProducer
-    @Override
-    public Channel getOutputChannel() {
-        return ep.getOutputChannel();
-    }
-
     @Override
     public void setChannel(Channel c) {
-        ep.setChannel(c);
+        super.setChannel(c);
+        
         proc.setChannel(c);
-    }
-    @Override
-    public void registerEvent(Event evt) {
-        ep.registerEvent(evt);
-
     }
 
     public void commitTask(IOTask t) {

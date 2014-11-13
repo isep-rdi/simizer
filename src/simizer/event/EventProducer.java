@@ -27,8 +27,9 @@ public class EventProducer implements IEventProducer {
     this.channel = channel;
   }
 
+  @Override
   public boolean cancelEvent(Event event) {
-    return channel.remove(event);
+    return channel.cancelEvent(event);
   }
 
 }

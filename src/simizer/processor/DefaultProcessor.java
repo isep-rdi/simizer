@@ -91,7 +91,7 @@ public class DefaultProcessor implements Processor{
                 //Retrieve the data from the disk and write it to the cache
                 Resource res = disk.read(rId);
                 
-                memory.writeToCache(res);
+                memory.write(res);
             }
             else{
                 r.setError(r.getError()+1);

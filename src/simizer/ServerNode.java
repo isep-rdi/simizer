@@ -169,7 +169,7 @@ public class ServerNode extends Node implements IEventProducer, RequestFinisher 
                 Resource res = disk.read(rId);
                 //size check
                 if (res != null) {
-                    memory.writeToCache(res);
+                    memory.write(res);
                 } else {
                     r.setError(r.getError() + 1);
                     System.out.println("Uh oh " + rId);

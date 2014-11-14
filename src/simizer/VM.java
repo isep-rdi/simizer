@@ -345,10 +345,10 @@ public class VM extends ServerNode {
         Resource  res = dt.getResource();
         switch (dt.getType()) {
             case READ:
-                memory.writeToCache(res);
+                memory.write(res);
                 return;
             case WRITE:
-                memory.writeToCache(res);
+                memory.write(res);
                 disk.write(res);
                 return;
             case  MODIFY:

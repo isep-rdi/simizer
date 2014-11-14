@@ -2,41 +2,51 @@
 
 package simizer.storage;
 
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 
 /**
+ * Represents a memory-based cache (speeds up file access times).
  *
  * @author sathiya
  */
 public class Cache extends StorageElement {
 
-  private static int PAGE_SZ = 4096; // memory page sz.
+  private static final double MB_DELAY = 0.019D;
 
-  private static double MB_DELAY = 0.019D;
-  private Map<Integer, Integer> counters = new HashMap<Integer, Integer>();
-
-  private LinkedList<Integer> seqList = new LinkedList<Integer>();
+  /**
+   * Stores the access order of the resources.
+   * <p>
+   * This allows the cache to implement a kind of LRU (Least Recently Used)
+   * policy for evicting data.  The data will be evicted when the space is
+   * needed for a new {@code Resource}.
+   */
+  private final LinkedList<Integer> cachedResources = new LinkedList<>();
 
   public Cache(long capacity, long accessDelay) {
     super(capacity, accessDelay, MB_DELAY);
   }
 
-  public void writeToCache(Resource r) {
-    if (r.size() <= capacity) {
-      while (r.size() + volumeFilled > capacity) {
-        this.delete(storage.get(seqList.removeFirst()));
+  @Override
+  public boolean write(Resource resource) {
+    if (resource.size() <= getCapacity()) {
+      while (resource.size() > getAvailableSpace()) {
+        delete(read(cachedResources.removeFirst()));
       }
 
-      this.seqList.addLast(r.getId());
-      write(r);
+      if (write(resource)) {
+        cachedResources.addLast(resource.getId());
+        return true;
+      }
     }
+
+    // either there wasn't enough space for it to ever fit,
+    // or there was some sort of a problem writing it to the storage
+    return false;
   }
 
   public void updateCache(Integer rId) {
-    this.seqList.remove(rId);
-    this.seqList.addLast(rId);
+    this.cachedResources.remove(rId);
+    this.cachedResources.addLast(rId);
   }
 
 }

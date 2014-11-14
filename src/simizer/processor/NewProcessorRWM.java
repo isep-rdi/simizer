@@ -109,7 +109,7 @@ public class NewProcessorRWM implements Processor, RequestProcessor{
                 Resource res = nodeInstance.getStorageElement().read(rId);
                 //size check
                 if(res != null)
-                    nodeInstance.getCache().writeToCache(res);
+                    nodeInstance.getCache().write(res);
                 else
                     r.setError(r.getError()+1);
             }

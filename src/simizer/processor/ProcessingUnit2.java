@@ -30,12 +30,12 @@ public class ProcessingUnit2 extends TaskProcessor {
                     public int compare(ProcTask o1, ProcTask o2) {
                         if(o1.equals(o2)) return 0;
                         double leftO1 = 
-                                (o1.getProcDone()*1.0D) / o1.getProc();
+                                (o1.getInstructionsCompleted()*1.0D) / o1.getInstructionsCount();
                         double leftO2 = 
-                                (o2.getProcDone()*1.0D) / o2.getProc();
+                                (o2.getInstructionsCompleted()*1.0D) / o2.getInstructionsCount();
                         int propComp = Double.compare(leftO1,leftO2);
                         if(propComp == 0) // Shortest task first in absolute value 
-                            return Long.compare(o1.getProcLeft(), o2.getProcLeft());
+                            return Long.compare(o1.getInstructionsRemaining(), o2.getInstructionsRemaining());
                         return propComp;
                     }
      };
@@ -121,7 +121,7 @@ public class ProcessingUnit2 extends TaskProcessor {
      */
     public long computeNextTaskEnd(long currentTime, ProcTask smallest, int taskPos) {
         
-        long epochLeft = (long) Math.floor(smallest.getProcLeft()*1.0 / EPOCH);
+        long epochLeft = (long) Math.floor(smallest.getInstructionsRemaining()*1.0 / EPOCH);
         long endIn = ((epochLeft * runningTasks.size())+1)*EPOCH;
         return 0;
         

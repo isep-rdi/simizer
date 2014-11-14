@@ -149,7 +149,7 @@ public class ProcessingUnit extends TaskProcessor {
         for (int i = 0; i < nbTasks; i++) {
             
             ProcTask t = runningQueue.remove();
-            long instLeft = t.getProcLeft();
+            long instLeft = t.getInstructionsRemaining();
             long nbInst = getNBInst(timestamp+left, DEF_EPOCH_GRAN);
         
             

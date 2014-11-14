@@ -12,8 +12,19 @@ import java.util.Map;
  */
 public class StorageElement {
 
+  /** The size of a kilobyte. */
+  public static final long KILOBYTE = 1024;
+
+  /** The size of a megabyte. */
+  public static final long MEGABYTE = KILOBYTE * KILOBYTE;
+  
+  /** The size of a gigabyte. */
+  public static final long GIGABYTE = KILOBYTE * MEGABYTE;
+
+  /** The size of a terabyte. */
+  public static final long TERABYTE = KILOBYTE * GIGABYTE;
+
   protected static ResourceFactory resourceFact;
-  static private long MEGABYTE = 1024 * 1024L;
 
   public static void setFactory(ResourceFactory rf) {
     resourceFact = rf;
@@ -43,51 +54,53 @@ public class StorageElement {
     this.mbReadDelay = mbReadDelay;
   }
 
-
-  public long volumeFilled() {
-    return volumeFilled;
-  }
-
-  public long storageCapacity() {
-    return this.capacity;
-  }
-
-  public long getAvailableCapacity() {
+  public long getAvailableSpace() {
     return (capacity - volumeFilled);
   }
 
-  public long getUsedSize() {
+  public long getUsedSpace() {
     return this.volumeFilled;
   }
 
-  public long getSize() {
+  public long getCapacity() {
     return this.capacity;
   }
 
-
   public Resource read(Integer resId) {
-    if (storage.containsKey(resId)) {
-      return storage.get(resId);
-    } else {
-      return null;
-    }
+    return storage.get(resId);
   }
 
-  public void write(Resource r) {
-    //checks wether it is a modification rather than a new file
-    if (storage.containsKey(r.getId())) {
-      storage.get(r.getId()).modify();
-    } else {
-      if (r.size() + volumeFilled <= capacity) {
-        storage.put(r.getId(), r);
-        volumeFilled += r.size();
+  public boolean write(Resource resource) {
+    // try to modify the file first, and if that fails, create it
+    if (!modify(resource)) {
+      if (resource.size() > getAvailableSpace()) {
+        return false;
       }
 
+      storage.put(resource.getId(), resource);
+      volumeFilled += resource.size();
+    }
+
+    return true;  // getting this far means that we could change the resource
+  }
+
+  public boolean modify(Resource resource) {
+    if (contains(resource.getId())) {
+      read(resource.getId()).modify();
+      return true;
+    } else {
+      return false;  // could not modify it because the file doesn't exist
     }
   }
 
-  public void modify(Resource res) {
-    throw new UnsupportedOperationException("Not yet implemented");
+  public boolean delete(Resource resource) {
+    if (contains(resource.getId())) {
+      storage.remove(resource.getId());
+      volumeFilled -= resource.size();
+      return true;
+    } else {
+      return false;
+    }
   }
 
   public void write(List<Integer> ressources) {
@@ -114,29 +127,23 @@ public class StorageElement {
     }
   }
 
-  public void delete(Resource r) {
-    if (storage.containsKey(r.getId())) {
-      storage.remove(r.getId());
-      volumeFilled -= r.size();
-    }
-  }
-
-  public Boolean contains(Integer resc_name) {
+  public boolean contains(Integer resc_name) {
     return storage.containsKey(resc_name);
   }
 
-  public boolean contains(List<Integer> ressources) {
-    boolean res = true;
-    for (Integer r : ressources) {
-      res &= contains(r);
+  public boolean contains(List<Integer> resources) {
+    for (Integer resource : resources) {
+      if (!contains(resource)) {
+        return false;
+      }
     }
-    return res;
+    return true;
   }
 
   public boolean isUnlocked(List<Integer> resources) {
     for (Integer id : resources) {
-      if (storage.containsKey(id)) {
-        Resource resource = this.storage.get(id);
+      if (contains(id)) {
+        Resource resource = read(id);
         if (!resource.isUnLocked()) {
           return false;
         }
@@ -161,7 +168,6 @@ public class StorageElement {
       return delay;
     }
   }
-
 
   public long getReadDelay(int id, int size) {
     if (storage.containsKey(id)) {

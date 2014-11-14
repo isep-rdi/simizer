@@ -173,7 +173,7 @@ public class VM extends ServerNode {
      */
     public int write(Resource res, int sz) {
        
-        if(disk.getUsedSize()+sz > disk.getSize()) 
+        if(disk.getUsedSpace()+sz > disk.getCapacity())
             return -1;
         
         currentTaskSession.addTask(
@@ -191,7 +191,7 @@ public class VM extends ServerNode {
         if(!disk.contains(resourceId))
             return -1;
         Resource res = disk.read(sz);
-        if(disk.getUsedSize()+(sz-res.size()) > disk.getSize()) 
+        if(disk.getUsedSpace()+(sz-res.size()) > disk.getCapacity())
             return -1;
         
         currentTaskSession.addTask(

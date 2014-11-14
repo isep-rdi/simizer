@@ -41,7 +41,7 @@ public class Network extends EventProducer {
     // System.out.println("Delay == " + delay);
     r.setDelay(r.getDelay() + delay);
     //2. send through sender
-    Message m = new Message(source, dest, r, 0, delay);
+    Message m = new Message(source, dest, r);
     registerEvent(new RequestReceivedEvent(timestamp + delay, m, dest));
     //System.out.println("Sending from " + source + " to " + dest);
   }

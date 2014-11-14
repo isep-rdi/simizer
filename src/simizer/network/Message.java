@@ -3,64 +3,56 @@ package simizer.network;
 import simizer.Node;
 import simizer.requests.Request;
 
+/**
+ * Encapsulates information to send a {@code Request} between {@code Node}s.
+ * <p>
+ * The {@code Message} class can be thought of as a kind of networking packet.
+ * It contains source and destination information, as well as some sort of
+ * payload.  When delivered, these values can be retrieved and referenced (for
+ * example, to handle the request and reply to the requestor).
+ */
 public class Message {
 
-  private Node origin;
-  private Node dest;
-  private Request r;
-  private long size;
-  private long delay;
+  /** The source of the {@code Message}. */
+  private final Node origin;
 
-  public Message(Node origin, Node dest, Request r, long size, long delay) {
-    this(origin, dest, r, size);
-    this.delay = delay;
-  }
+  /** The destination of the {@code Message}. */
+  private final Node destination;
 
-  public Message(Node origin, Node dest, Request r, long size) {
-    this(origin, dest, r);
-    this.size = size;
-  }
+  /** The request contained in the {@code Message}. */
+  private final Request request;
 
-  public Message(Node origin, Node dest, Request r) {
+  public Message(Node origin, Node destination, Request request) {
     this.origin = origin;
-    this.dest = dest;
-    this.r = r;
-  }
-
-  public long getDelay() {
-    return delay;
+    this.destination = destination;
+    this.request = request;
   }
 
   /**
-   * @return the origin
+   * Returns the {@code Node} where the {@code Message} originated.
+   *
+   * @return the {@code Node} where the {@code Message} originated
    */
   public Node getOrigin() {
     return origin;
   }
 
   /**
-   * @return the dest
+   * Returns the {@code Node} where the {@code Message} will be delivered.
+   * 
+   * @return the {@code Node} where the {@code Message} will be delivered
    */
-  public Node getDest() {
-    return dest;
+  public Node getDestination() {
+    return destination;
   }
 
   /**
-   * @return the r
+   * Returns the {@code Request} contained in this {@code Message}.
+   *
+   * @return the {@code Request} contained in this {@code Message}
    */
   public Request getRequest() {
-    return r;
-  }
-
-  /**
-   * @return the size
-   */
-  public long getSize() {
-    return size;
-  }
-
-  public void setDelay(long delay) {
-    this.delay = delay;
+    return request;
   }
 
 }

@@ -1,70 +1,66 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package simizer.network;
 
 import simizer.Node;
 import simizer.requests.Request;
-import simizer.requests.RequestReceiver;
 
-/**
- *
- * @author isep
- */
 public class Message {
-    private Node origin, dest;
-    private Request r;
-    private long size;
-    private long delay;
-    
-    public Message(Node origin, Node dest, Request r, long size, long delay) {
-        this(origin, dest, r, size);
-        this.delay = delay;
-    }
-    public Message(Node origin,  Node dest, Request r, long size) {
-        this(origin, dest, r);
-        this.size = size;
-        
-    }
-    public Message(Node origin,  Node dest, Request r) {
-        this.origin = origin;
-        this.dest = dest;
-        this.r = r;
-    }
-    public long getDelay() {
-        return delay;
-    }
 
-    /**
-     * @return the origin
-     */
-    public Node getOrigin() {
-        return origin;
-    }
+  private Node origin;
+  private Node dest;
+  private Request r;
+  private long size;
+  private long delay;
 
-    /**
-     * @return the dest
-     */
-    public Node getDest() {
-        return dest;
-    }
+  public Message(Node origin, Node dest, Request r, long size, long delay) {
+    this(origin, dest, r, size);
+    this.delay = delay;
+  }
 
-    /**
-     * @return the r
-     */
-    public Request getRequest() {
-        return r;
-    }
+  public Message(Node origin, Node dest, Request r, long size) {
+    this(origin, dest, r);
+    this.size = size;
+  }
 
-    /**
-     * @return the size
-     */
-    public long getSize() {
-        return size;
-    }
+  public Message(Node origin, Node dest, Request r) {
+    this.origin = origin;
+    this.dest = dest;
+    this.r = r;
+  }
 
-    public void setDelay(long delay) {
-        this.delay = delay;
-    }
+  public long getDelay() {
+    return delay;
+  }
+
+  /**
+   * @return the origin
+   */
+  public Node getOrigin() {
+    return origin;
+  }
+
+  /**
+   * @return the dest
+   */
+  public Node getDest() {
+    return dest;
+  }
+
+  /**
+   * @return the r
+   */
+  public Request getRequest() {
+    return r;
+  }
+
+  /**
+   * @return the size
+   */
+  public long getSize() {
+    return size;
+  }
+
+  public void setDelay(long delay) {
+    this.delay = delay;
+  }
+
 }

@@ -23,19 +23,19 @@ public class StorageElement {
     return resourceFact;
   }
 
-  protected int nodeid = -1;
-  protected long capacity, delay;
+  protected long volumeFilled = 0;
+  protected long capacity;
+  protected long delay;
+
   protected double mbReadDelay = 2.0;
   protected double mbWriteDelay = 2.0;
 
-  protected long volumeFilled = 0;
   protected final Map<Integer, Resource> storage;
-  private boolean lock = false;
 
   public StorageElement(long capacity, long accessDelay) {
     this.capacity = capacity;
     this.delay = accessDelay;
-    this.storage = new HashMap<Integer, Resource>();
+    this.storage = new HashMap<>();
   }
 
   public StorageElement(long capacity, long accessDelay, double mbReadDelay) {
@@ -43,12 +43,33 @@ public class StorageElement {
     this.mbReadDelay = mbReadDelay;
   }
 
-  public long getDelay(Integer ressourceId) {
-    if (storage.containsKey(ressourceId)) {
-      long rDelay = Math.round((storage.get(ressourceId).size() / MEGABYTE) * mbReadDelay);
-      return rDelay + delay; //disk_seek
+
+  public long volumeFilled() {
+    return volumeFilled;
+  }
+
+  public long storageCapacity() {
+    return this.capacity;
+  }
+
+  public long getAvailableCapacity() {
+    return (capacity - volumeFilled);
+  }
+
+  public long getUsedSize() {
+    return this.volumeFilled;
+  }
+
+  public long getSize() {
+    return this.capacity;
+  }
+
+
+  public Resource read(Integer resId) {
+    if (storage.containsKey(resId)) {
+      return storage.get(resId);
     } else {
-      return delay;
+      return null;
     }
   }
 
@@ -65,43 +86,8 @@ public class StorageElement {
     }
   }
 
-  public void delete(Resource r) {
-    if (storage.containsKey(r.getId())) {
-      storage.remove(r.getId());
-      volumeFilled -= r.size();
-    }
-  }
-
-  public Resource read(Integer resId) {
-    if (storage.containsKey(resId)) {
-      return storage.get(resId);
-    } else {
-      return null;
-    }
-  }
-
-  public Boolean contains(Integer resc_name) {
-    return storage.containsKey(resc_name);
-  }
-
-  public long volumeFilled() {
-    return volumeFilled;
-  }
-
-  public long storageCapacity() {
-    return this.capacity;
-  }
-
-  public long getAvailableCapacity() {
-    return (capacity - volumeFilled);
-  }
-
-  public boolean contains(List<Integer> ressources) {
-    boolean res = true;
-    for (Integer r : ressources) {
-      res &= contains(r);
-    }
-    return res;
+  public void modify(Resource res) {
+    throw new UnsupportedOperationException("Not yet implemented");
   }
 
   public void write(List<Integer> ressources) {
@@ -128,24 +114,54 @@ public class StorageElement {
     }
   }
 
-  public boolean isUnlocked(List<Integer> ressources) {
-    boolean unlock = true;
-    if (this.lock) {
-      return false;
-    } else {
-      for (Integer r : ressources) {
-        if (storage.containsKey(r)) {
-          Resource rTest = this.storage.get(r);
-          unlock &= rTest.isUnLocked();
+  public void delete(Resource r) {
+    if (storage.containsKey(r.getId())) {
+      storage.remove(r.getId());
+      volumeFilled -= r.size();
+    }
+  }
+
+  public Boolean contains(Integer resc_name) {
+    return storage.containsKey(resc_name);
+  }
+
+  public boolean contains(List<Integer> ressources) {
+    boolean res = true;
+    for (Integer r : ressources) {
+      res &= contains(r);
+    }
+    return res;
+  }
+
+  public boolean isUnlocked(List<Integer> resources) {
+    for (Integer id : resources) {
+      if (storage.containsKey(id)) {
+        Resource resource = this.storage.get(id);
+        if (!resource.isUnLocked()) {
+          return false;
         }
       }
-      return unlock;
     }
+    return true;
   }
 
   public Iterable<Resource> getResourcesList() {
     return this.storage.values();
   }
+
+  private static long computeDelay(double mbDelay, long seekDelay, int size) {
+    return Math.round((size * 1.0 / MEGABYTE) * mbDelay) + seekDelay;
+  }
+
+  public long getDelay(Integer ressourceId) {
+    if (storage.containsKey(ressourceId)) {
+      long rDelay = Math.round((storage.get(ressourceId).size() / MEGABYTE) * mbReadDelay);
+      return rDelay + delay; //disk_seek
+    } else {
+      return delay;
+    }
+  }
+
 
   public long getReadDelay(int id, int size) {
     if (storage.containsKey(id)) {
@@ -157,22 +173,6 @@ public class StorageElement {
 
   public long getWriteDelay(int id, int size) {
     return computeDelay(mbWriteDelay, delay, size);
-  }
-
-  private static long computeDelay(double mbDelay, long seekDelay, int size) {
-    return Math.round((size * 1.0 / MEGABYTE) * mbDelay) + seekDelay;
-  }
-
-  public void modify(Resource res) {
-    throw new UnsupportedOperationException("Not yet implemented");
-  }
-
-  public long getUsedSize() {
-    return this.volumeFilled;
-  }
-
-  public long getSize() {
-    return this.capacity;
   }
 
 }

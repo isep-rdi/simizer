@@ -323,7 +323,8 @@ public class Simizer {
 //            n.getCapacity();
             StorageElement se = new StorageElement(
                     ((long) resfac.getMax()) * resfac.getResourceSize()
-                    , 4L, 2.0);
+                    , 4L);
+            se.setPerMBReadDelay(2.0);
             //se.write(resfac.getStartList(nbResPerNode));
             se.write(resfac.getStartList());
             n.setStorage(se);

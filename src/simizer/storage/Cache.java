@@ -23,13 +23,15 @@ public class Cache extends StorageElement {
   private final LinkedList<Integer> cachedResources = new LinkedList<>();
 
   public Cache(long capacity, long accessDelay) {
-    super(capacity, accessDelay, MB_DELAY);
+    super(capacity, accessDelay);
+
+    setPerMBReadDelay(MB_DELAY);
   }
 
   @Override
   public boolean write(Resource resource) {
     if (resource.size() <= getCapacity()) {
-      while (resource.size() > getAvailableSpace()) {
+      while (resource.size() > getFreeSpace()) {
         delete(read(cachedResources.removeFirst()));
       }
 

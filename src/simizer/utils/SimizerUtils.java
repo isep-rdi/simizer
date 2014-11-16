@@ -54,7 +54,8 @@ public class SimizerUtils {
                 System.out.println(processorNom);
                 
                 for(int i= 0; i< nbNode.intValue();i++) {
-                    StorageElement disk = new StorageElement(diskSize.intValue(),4,2.0);
+                    StorageElement disk = new StorageElement(diskSize.intValue(),4);
+                    disk.setPerMBReadDelay(2.0);
                     
                     processor = createProcessor((int )cpu.longValue(), nbMips.doubleValue(), processorNom);
                     ServerNode current =new ServerNode(id,

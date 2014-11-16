@@ -15,11 +15,13 @@ public class Memory extends StorageElement {
   private LinkedList<Resource> cachedResource = new LinkedList<>();
 
   public Memory(long capacity, long accessDelay) {
-    super(capacity, accessDelay, MB_DELAY);
+    super(capacity, accessDelay);
+
+    setPerMBReadDelay(MB_DELAY);
   }
 
   public long getFreeMemory() {
-    return this.capacity - volumeFilled;
+    return this.capacity - used;
   }
 
   public long getAvailableMemory() {

@@ -103,7 +103,7 @@ public class ServerNode extends Node
     StorageElement se = getStorageElement();
     long total = 0, nb = 0;
 
-    for (Resource r : se.getResourcesList()) {
+    for (Resource r : se.getResources()) {
       total += r.size();
       nb++;
     }

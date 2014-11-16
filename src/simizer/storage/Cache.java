@@ -69,8 +69,9 @@ public class Cache extends StorageElement {
     // actually contained in the cache.  If it is not, it could cause the
     // write() method above to throw a NullPointerException.  (It will try to
     // delete a null resource.)
-    
-    this.cachedResources.remove(resourceId);
+
+    // casting is necessary so that the value is not treated as an index
+    this.cachedResources.remove((Integer)resourceId);
     this.cachedResources.addLast(resourceId);
   }
 

@@ -144,7 +144,7 @@ public class StorageElement {
     for (Integer id : resources) {
       if (contains(id)) {
         Resource resource = read(id);
-        if (!resource.isUnLocked()) {
+        if (!resource.isUnlocked()) {
           return false;
         }
       }

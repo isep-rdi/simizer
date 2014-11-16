@@ -119,10 +119,10 @@ public class Simizer {
         //@TODO create a storage element for each node with different ressources (RR fashion)
 
         StorageElement.setFactory(resfac);
-        final StorageElement se = new StorageElement(resfac.getMax() * resfac.getSize(), 6L);
+        final StorageElement se = new StorageElement(resfac.getMax() * resfac.getResourceSize(), 6L);
         se.write(resfac.getStartList());
 
-        resfac.getSize();
+        resfac.getResourceSize();
         //3. charger les noeuds
         final Map<Integer, Node> nodeMap = new TreeMap<Integer, Node>();
         //Network setup
@@ -322,7 +322,7 @@ public class Simizer {
             n.setFrontendNode(lbn);
 //            n.getCapacity();
             StorageElement se = new StorageElement(
-                    ((long) resfac.getMax()) * resfac.getSize()
+                    ((long) resfac.getMax()) * resfac.getResourceSize()
                     , 4L, 2.0);
             //se.write(resfac.getStartList(nbResPerNode));
             se.write(resfac.getStartList());

@@ -6,12 +6,18 @@ import java.util.LinkedList;
 
 /**
  * Represents a memory-based cache (speeds up file access times).
+ * <p>
+ * The implementation of this class is essentially the same as a {@link
+ * StorageElement}, with two modifications to its behavior:
+ * <ul><li>the speed of reading has been increased
+ *     <li>{@link Resource}s are automatically removed to make room for newer
+ *         {@link Resource}s that are written</ul>
  *
  * @author sathiya
  */
 public class Cache extends StorageElement {
 
-  private static final double MB_DELAY = 0.019D;
+  private static final double PER_MB_DELAY = 0.019D;
 
   /**
    * Stores the access order of the resources.
@@ -25,7 +31,11 @@ public class Cache extends StorageElement {
   public Cache(long capacity, long accessDelay) {
     super(capacity, accessDelay);
 
-    setPerMBReadDelay(MB_DELAY);
+    setPerMBReadDelay(PER_MB_DELAY);
+
+    // TODO: I think that we should probably set the write delay here also.
+    // Since the old code did not, I won't change it, but it's something to
+    // consider for the future.
   }
 
   @Override
@@ -35,7 +45,7 @@ public class Cache extends StorageElement {
         delete(read(cachedResources.removeFirst()));
       }
 
-      if (write(resource)) {
+      if (super.write(resource)) {
         cachedResources.addLast(resource.getId());
         return true;
       }
@@ -46,9 +56,22 @@ public class Cache extends StorageElement {
     return false;
   }
 
-  public void updateCache(Integer rId) {
-    this.cachedResources.remove(rId);
-    this.cachedResources.addLast(rId);
+  /**
+   * Marks the resource with the specified ID as having been accessed.
+   * <p>
+   * When a value in the cache is used, we should re-add it to the back of the
+   * LRU queue.
+   * 
+   * @param resourceId the ID of the resource that was accessed
+   */
+  public void updateCache(int resourceId) {
+    // TODO: This should probably make sure that the specified resource is
+    // actually contained in the cache.  If it is not, it could cause the
+    // write() method above to throw a NullPointerException.  (It will try to
+    // delete a null resource.)
+    
+    this.cachedResources.remove(resourceId);
+    this.cachedResources.addLast(resourceId);
   }
 
 }

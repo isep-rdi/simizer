@@ -66,11 +66,12 @@ public class Network extends EventProducer {
    * Sends the specified {@code Request} to the destination.
    *
    * @param source the {@code Node} where the request originated
-   * @param destination the {@code Node} where the request should be delivered
+   * @param destination the {@code MessageReceiver} where the request should be
+   *            delivered
    * @param request the {@code Request} to deliver
    * @param timestamp the timestamp when the {@code Message} is sent
    */
-  public void send(Node source, Node destination, Request request,
+  public void send(Node source, MessageReceiver destination, Request request,
         long timestamp) {
 
     // add the delay to the message

@@ -17,12 +17,12 @@ public class Message {
   private final Node origin;
 
   /** The destination of the {@code Message}. */
-  private final Node destination;
+  private final MessageReceiver destination;
 
   /** The request contained in the {@code Message}. */
   private final Request request;
 
-  public Message(Node origin, Node destination, Request request) {
+  public Message(Node origin, MessageReceiver destination, Request request) {
     this.origin = origin;
     this.destination = destination;
     this.request = request;
@@ -42,7 +42,7 @@ public class Message {
    * 
    * @return the {@code Node} where the {@code Message} will be delivered
    */
-  public Node getDestination() {
+  public MessageReceiver getDestination() {
     return destination;
   }
 

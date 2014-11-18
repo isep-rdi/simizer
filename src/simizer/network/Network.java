@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import simizer.Node;
 import simizer.event.EventProducer;
-import simizer.event.RequestReceivedEvent;
+import simizer.event.MessageReceivedEvent;
 import simizer.laws.Law;
 import simizer.requests.Request;
 
@@ -79,7 +79,7 @@ public class Network extends EventProducer {
 
     // send it to the destination
     Message m = new Message(source, destination, request);
-    registerEvent(new RequestReceivedEvent(timestamp + delay, m, destination));
+    registerEvent(new MessageReceivedEvent(timestamp + delay, m, destination));
   }
 
   /**

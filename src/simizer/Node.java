@@ -3,7 +3,7 @@ package simizer;
 import simizer.network.Message;
 import simizer.network.Network;
 import simizer.requests.Request;
-import simizer.requests.RequestReceiver;
+import simizer.network.MessageReceiver;
 
 /**
  * The Node Class represents a system being able to communicate through a
@@ -15,7 +15,7 @@ import simizer.requests.RequestReceiver;
  *
  * comment
  */
-public abstract class Node implements RequestReceiver {
+public abstract class Node implements MessageReceiver {
 
   protected int id;
   protected Network nw;
@@ -48,7 +48,7 @@ public abstract class Node implements RequestReceiver {
   }
 
   @Override
-  public void onRequestReception(long timestamp, Message m) {
+  public void onMessageReceived(long timestamp, Message m) {
     this.clock = timestamp;
     onRequestReceived(m.getOrigin(), m.getRequest());
   }

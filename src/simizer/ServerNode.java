@@ -186,7 +186,7 @@ public class ServerNode extends Node
   }
 
   @Override
-  public void onRequestReception(long timestamp, Message m) {
+  public void onMessageReceived(long timestamp, Message m) {
     Request r = m.getRequest();
     r.setNode(id);
     /**

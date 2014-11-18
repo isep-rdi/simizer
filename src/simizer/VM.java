@@ -131,7 +131,7 @@ public class VM extends ServerNode {
    * @param m
    */
   @Override
-  public void onRequestReception(long timestamp, Message m) {
+  public void onMessageReceived(long timestamp, Message m) {
     this.clock = timestamp;
     onRequestReceived(m.getOrigin(), m.getRequest());
 
@@ -230,7 +230,7 @@ public class VM extends ServerNode {
     if (dest == this) {
       //RequestEndedEvent
       this.registerEvent(
-              new RequestReceivedEvent(
+              new MessageReceivedEvent(
                       timestamp,
                       new Message(this, this, req),
                       this

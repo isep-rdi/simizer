@@ -1,5 +1,5 @@
 /**
- * Provides the necessary classes to simulate sending requests.
+ * Provides the infrastructure to send requests and receive responses.
  * <p>
  * There are two main ways to create and send requests:
  * <ul><li>The default request does not require an answer from the destination

@@ -6,11 +6,6 @@ import simizer.utils.Vector;
 
 public class Request {
 
-  public static final RequestComparator requestComparator
-      = new RequestComparator();
-  public static final RequestFtimeComparator requestFtimeComparator
-      = new RequestFtimeComparator();
-
   private long id;
   private int node = -1;
   private long nbInstructions;

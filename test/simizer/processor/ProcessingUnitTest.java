@@ -72,7 +72,7 @@ public class ProcessingUnitTest {
         long timestamp = 0L;
         IOTask t = null;
         ProcessingUnit instance = null;
-        instance.onDataReady(timestamp, t);
+        // instance.onDataReady(timestamp, t);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
@@ -86,7 +86,7 @@ public class ProcessingUnitTest {
         long timestamp = 0L;
         ProcTask pt = null;
         ProcessingUnit instance = null;
-        instance.startProcTask(timestamp, pt);
+        // instance.startProcTask(timestamp, pt);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }

@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Queue;
 import simizer.event.EventProducer;
 import simizer.processor.ProcessingUnit2;
-import simizer.processor.events.IOTaskEvent;
 import simizer.processor.tasks.DiskTask;
 
 /**
@@ -86,9 +85,10 @@ public class IOController extends EventProducer {
        Resource r = dt.getResource();
        if(nextEvent > timestamp)
            nextEvent += disk.getDelay(r.getId());
-    
-       this.registerEvent(
-               new IOTaskEvent(nextEvent, dt,this.pu));
+
+       // Max: Commented this out because of changes to TaskSession.
+//       this.registerEvent(
+//               new IOTaskEvent(nextEvent, dt,this.pu));
        
     }
     public void scheduleWriteToDisk(DiskTask dt, long timestamp) {

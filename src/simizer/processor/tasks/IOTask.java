@@ -1,7 +1,5 @@
 package simizer.processor.tasks;
 
-import simizer.VM;
-
 /**
  * Represents a task that performs an IO operation.
  * <p>
@@ -34,8 +32,5 @@ public abstract class IOTask extends Task {
   public int getSize() {
     return size;
   }
-
-  @Override
-  public abstract void startTask(VM vm, long timestamp);
 
 }

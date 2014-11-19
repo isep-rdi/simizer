@@ -2,6 +2,7 @@ package simizer.processor.tasks;
 
 import simizer.Node;
 import simizer.VM;
+import simizer.processor.TaskProcessor;
 import simizer.requests.Request;
 
 /**
@@ -20,6 +21,7 @@ public class SendTask extends IOTask {
 
   private final Request request;
   private final Node destination;
+  private final VM vm;
 
   /**
    * Initializes a new {@code Task} to send a request.
@@ -30,12 +32,14 @@ public class SendTask extends IOTask {
    *
    * @param request the request to send
    * @param destination the destination of the request
+   * @param vm the {@link VM} from which the {@link Request} is sent
    */
-  public SendTask(Request request, Node destination) {
+  public SendTask(Request request, Node destination, VM vm) {
     super(request.getSize());
 
     this.request = request;
     this.destination = destination;
+    this.vm = vm;
   }
 
   /**
@@ -69,28 +73,18 @@ public class SendTask extends IOTask {
     return destination;
   }
 
-  /**
-   * {@inheritDoc}
-   * <p>
-   * In this class, the behavior is to send a {@link Request} over the network.
-   * This can be useful, for example, in order to schedule a network operation
-   * to occur after some processing or disk operation has been completed.
-   * 
-   * @param vm the virtual machine executing the request
-   * @param timestamp the time when the {@code Task} is started
-   */
   @Override
-  public void startTask(VM vm, long timestamp) {
+  public void run(TaskProcessor processor, long timestamp) {
+    super.run(processor, timestamp);
+    
     if (request.getArTime() == -1) {
       request.setArtime(timestamp);
     } else {
       request.setFinishTime(timestamp);
     }
 
-    TaskSession ts = super.getTaskSession();
-    if (ts.isComplete()) {
-      vm.endTaskSession(ts, timestamp);
-    }
     vm.send(destination, request, timestamp);
+
+    finish(timestamp);  // ends the Task and starts the next one
   }
 }

@@ -157,9 +157,4 @@ public class ProcessingUnit2 extends TaskProcessor {
         }                           
     }
 
-    @Override
-    public void onDataReady(long timestamp, IOTask t) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-   
 }

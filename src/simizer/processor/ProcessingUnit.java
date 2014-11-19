@@ -52,56 +52,36 @@ public class ProcessingUnit extends TaskProcessor {
     return this.nbProc;
   }
 
-  /**
-   * Called when a IOTask has ended. If the next Task in the TaskSesssion is a
-   * ProcTask, then it will preempt currently running tasks by scheduling a new
-   * Epoch. Other wise the next IO task is delegated to the vm.
-   *
-   * @param t
-   * @see IOTask
-   * @see TaskSession
-   * @see VM
-   *
-   * @param timestamp
-   */
   @Override
-  public void onDataReady(long timestamp, IOTask t) {
-
-    //1. gets next task.
-    t.finishTask();
-    vmInstance.commitTask(t);
-    TaskSession ts = t.getTaskSession();
-
-    Task nextTask = ts.getNextTask();
-
-    if (nextTask == null) { //nothing to do here anymore, session is ended.
-      vmInstance.endTaskSession(ts, timestamp);
-      return;
-    }
-
-    //If it is processing task, then it will preempt currenlty
-    // running tasks.
-    //clear upcoming epochs and taskevents.
-    // restart a new Epoch.
-    if (nextTask instanceof ProcTask) {
+  public void runTask(Task task, long timestamp) {
+    // If it is processing task, then it will preempt currenlty running tasks.
+    // Clear upcoming epochs and TaskEvents and restart a new Epoch.
+    if (task instanceof ProcTask) {
       cancelEvent(upcomingEpoch);
       for (ProcTaskEndedEvent tee : upComingTasks.values()) {
         cancelEvent(tee);
       }
       upComingTasks.clear();
+
+      readyQueue.addLast((ProcTask) task);
+      scheduleEpoch(timestamp);
     }
-    nextTask.startTask(vmInstance, timestamp);
+
+    super.runTask(task, timestamp);
   }
 
-  /**
-   * Starts a new processing task
-   *
-   * @param timestamp
-   * @param pt
-   */
-  public void startProcTask(long timestamp, ProcTask pt) {
-    readyQueue.addLast(pt);
-    scheduleEpoch(timestamp);
+  @Override
+  public void endTask(Task task, long timestamp) {
+    if (task instanceof ProcTask) {
+      upComingTasks.remove((ProcTask) task);
+    }
+
+    super.endTask(task, timestamp);
+  }
+
+  @Override
+  public void onProcTaskEnded(long timestamp, ProcTask task) {
+    task.finish(timestamp);
   }
 
   /**
@@ -224,20 +204,5 @@ public class ProcessingUnit extends TaskProcessor {
    * Method called when a response is received, from a remote message
    */
   public void onResponseReceived(long timestamp, SendTask data) {}
-
-  /**
-   * Ends the current task and starts the next one
-   *
-   * @param timestamp
-   * @param data
-   */
-  @Override
-  public void onProcTaskEnded(long timestamp, ProcTask data) {
-    data.finishTask();
-    upComingTasks.remove(data);
-    if (!data.getTaskSession().isComplete()) {
-      data.getTaskSession().getNextTask().startTask(vmInstance, timestamp);
-    }
-  }
 
 }

@@ -1,8 +1,5 @@
 package simizer.processor.tasks;
 
-import simizer.VM;
-import simizer.processor.ProcessingUnit;
-
 /**
  * A task representing some CPU-intensive operation.
  * <p>
@@ -78,18 +75,4 @@ public class ProcTask extends Task {
     }
   }
 
-  /**
-   * {@inheritDoc}
-   * <p>
-   * In this case, the behavior is to schedule the {@code ProcTask} for
-   * execution on the processor.
-   *
-   * @param vm the {@code VM} on which the {@code Task} is run
-   * @param timestamp the timestamp when the {@code Task} is started
-   */
-  @Override
-  public void startTask(VM vm, long timestamp) {
-    ProcessingUnit pu = vm.getProcessingUnit();
-    pu.startProcTask(timestamp, this);
-  }
 }

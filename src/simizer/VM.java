@@ -149,7 +149,7 @@ public class VM extends ServerNode {
     Resource res = disk.read(resourceId);
 
     if (res != null) {
-      currentTaskSession.addTask(new DiskTask(sz, res, IOType.READ));
+      currentTaskSession.addTask(new DiskTask(this, sz, res, IOType.READ));
     }
 
     return res;
@@ -166,7 +166,7 @@ public class VM extends ServerNode {
       return null;
     }
     currentTaskSession.addTask(
-            new DiskTask((int) res.size(), res, IOType.READ));
+            new DiskTask(this, (int) res.size(), res, IOType.READ));
     return res;
   }
 
@@ -187,7 +187,7 @@ public class VM extends ServerNode {
     }
 
     currentTaskSession.addTask(
-            new DiskTask(sz, res, IOType.WRITE));
+            new DiskTask(this, sz, res, IOType.WRITE));
     return 0;
   }
 
@@ -209,7 +209,7 @@ public class VM extends ServerNode {
     }
 
     currentTaskSession.addTask(
-            new DiskTask(sz, res, IOType.MODIFY));
+            new DiskTask(this, sz, res, IOType.MODIFY));
     return res.getVersion() + 1;
   }
 
@@ -251,10 +251,7 @@ public class VM extends ServerNode {
    * Called at the end of request handling Starts task session processing.
    */
   private void executeTaskSession() {
-    Task currentTask = currentTaskSession.getNextTask();
-    if (currentTask != null) {
-      currentTask.startTask(this, clock);
-    }
+    getProcessingUnit().scheduleTask(currentTaskSession, clock);
     currentTaskSession = null;
   }
 
@@ -281,7 +278,7 @@ public class VM extends ServerNode {
   public boolean sendRequest(Node dest, Request req) {
     //req.setArtime(clock);
     if (nw.getNode(dest.getId()) != null) {
-      currentTaskSession.addTask(new SendTask(req, dest));
+      currentTaskSession.addTask(new SendTask(req, dest, this));
       // currentTaskSession.complete();
       return true;
     }
@@ -303,7 +300,7 @@ public class VM extends ServerNode {
     }
 
     // target node exists and request is valid
-    currentTaskSession.addTask(new SendTask(req, dest));
+    currentTaskSession.addTask(new SendTask(req, dest, this));
 
     return true;
   }

@@ -1,8 +1,8 @@
 package simizer.processor.tasks;
 
 import simizer.VM;
+import simizer.event.Event;
 import simizer.processor.TaskProcessor;
-import simizer.processor.events.IOTaskEvent;
 import simizer.storage.IOType;
 import simizer.storage.Resource;
 
@@ -22,20 +22,25 @@ public class DiskTask extends IOTask {
   /** The type of action to take with the resource. */
   private final IOType type;
 
+  /** The {@code VM} that should be used for IO operations. */
+  private final VM vm;
+
   /**
    * Initializes a new {@code DiskTask}.
    * <p>
    * When run, this task will simulate performing the specified action on the
-   * specified resource, and it will send an {@link IOTaskEvent} upon
+   * specified resource, and it will send an {@code IOTaskEvent} upon
    * completion.
    *
+   * @param vm the {@link VM} where the {@code DiskTask} is operating
    * @param size the size of the resource being modified
    * @param resource the actual resource being modified
    * @param type the type of action that should be taken with the resource
    */
-  public DiskTask(int size, Resource resource, IOType type) {
+  public DiskTask(VM vm, int size, Resource resource, IOType type) {
     super(size);
 
+    this.vm = vm;
     this.resource = resource;
     this.type = type;
   }
@@ -58,21 +63,39 @@ public class DiskTask extends IOTask {
     return resource;
   }
 
-  /**
-   * {@inheritDoc}
-   * <p>
-   * When the task is complete, it triggers an event of type {@link
-   * IOTaskEvent}.  (The event is given the {@link TaskProcessor} for the
-   * specified {@link VM}.)
-   *
-   * @param vm the {@code VM} on which the task is run
-   * @param timestamp the time when the task is run
-   */
   @Override
-  public void startTask(VM vm, long timestamp) {
-    long timing = vm.getTaskLength(this);
+  public void run(TaskProcessor processor, long timestamp) {
+    super.run(processor, timestamp);
 
-    vm.registerEvent(
-        new IOTaskEvent(timestamp + timing, this, vm.getProcessingUnit()));
+    long delay = vm.getTaskLength(this);
+    processor.registerEvent(
+        new DiskTaskEvent(timestamp + delay, this, this));
+  }
+
+  /**
+   * Called when a {@code DiskTask} has finished.
+   *
+   * @param timestamp the current timestamp of the simulation
+   * @param task the {@link DiskTask} that has "finished" (i.e., read its data
+   *            from the disk)
+   */
+  public void onDataReady(long timestamp, DiskTask task) {
+    vm.commitTask(task);
+    finish(timestamp);
+  }
+
+}
+
+/**
+ * Signals the completion of a disk IO operation.
+ */
+class DiskTaskEvent extends Event<DiskTask, DiskTask> {
+  public DiskTaskEvent(long timestamp, DiskTask data, DiskTask target) {
+    super(timestamp, data, target);
+  }
+
+  @Override
+  public void dispatch() {
+    this.target.onDataReady(timestamp, data);
   }
 }

@@ -63,7 +63,7 @@ public class TaskSession {
    * <p>
    * Note that this is not a constant method, meaning that each iteration will
    * cause the current task to be removed from the {@code TaskSession} and
-   * replaced with the followign {@code Task}.
+   * replaced with the following {@code Task}.
    * 
    * @return the next task
    */

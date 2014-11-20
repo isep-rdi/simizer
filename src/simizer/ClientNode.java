@@ -123,7 +123,7 @@ public class ClientNode extends Node {
     requestCount++;
     System.out.println(r.toString()
         + ";" + (timestamp - r.getArTime())
-        + ";" + this.id);
+        + ";" + getId());
     //if(timestamp < endTime)
     if (requestCount < MAX_REQ) {
       scheduleNextRequest(timestamp);
@@ -136,7 +136,7 @@ public class ClientNode extends Node {
     long nextTime = thinkTimeLaw.nextValue();
     int tplId = requestLaw.nextValue();
     Request r = requestFact.getRequest(timestamp + nextTime, tplId);
-    nw.send(this, serviceAddress, r, timestamp + nextTime);
+    getNetwork().send(this, serviceAddress, r, timestamp + nextTime);
   }
 
   public long getEndTime() {

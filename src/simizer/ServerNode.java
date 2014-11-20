@@ -180,7 +180,7 @@ public class ServerNode extends Node
       }
     }
 
-    nw.send(this, frontendNode, r, timestamp);
+    getNetwork().send(this, frontendNode, r, timestamp);
     counter--;
 
   }
@@ -188,7 +188,7 @@ public class ServerNode extends Node
   @Override
   public void onMessageReceived(long timestamp, Message m) {
     Request r = m.getRequest();
-    r.setNode(id);
+    r.setNode(getId());
     /**
      * @TODO Check list of resource: For each resource in request check if
      * present in cache or disk disk.getRessource and memory.getResource for(int
@@ -197,7 +197,7 @@ public class ServerNode extends Node
      * If resource not in cache or disk, send request to next node.
      * nw.getNodeList(); this.nw.getNode(id+1); this.memory.writeToCache(null);
      */
-    List<Node> nodeList = nw.getNodeList();
+    List<Node> nodeList = getNetwork().getNodeList();
 
 //         for(Integer rId:r.getResources()) {
 //            if (!memory.contains(rId) && !disk.contains(rId) ) {    

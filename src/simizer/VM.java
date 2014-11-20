@@ -43,7 +43,7 @@ public class VM extends ServerNode {
         StorageElement disk, double hCost) {
 
     super(id, 0, 0, 0, null, null);
-    this.nw = n;
+    setNetwork(n);
     this.proc = p;
     this.memorySize = memSize;
     this.memory = new Cache(memorySize, 1);
@@ -238,7 +238,7 @@ public class VM extends ServerNode {
       return;
     }
 
-    nw.send(this, dest, req, timestamp);
+    getNetwork().send(this, dest, req, timestamp);
   }
 
   private void initTaskSession() {
@@ -277,7 +277,7 @@ public class VM extends ServerNode {
    */
   public boolean sendRequest(Node dest, Request req) {
     //req.setArtime(clock);
-    if (nw.getNode(dest.getId()) != null) {
+    if (getNetwork().getNode(dest.getId()) != null) {
       currentTaskSession.addTask(new SendTask(req, dest, this));
       // currentTaskSession.complete();
       return true;
@@ -295,7 +295,7 @@ public class VM extends ServerNode {
    * @param req
    */
   public boolean sendResponse(Request req, Node dest) {
-    if (nw.getNode(dest.getId()) == null || req.getArTime() < 0) {
+    if (getNetwork().getNode(dest.getId()) == null || req.getArTime() < 0) {
       return false;
     }
 

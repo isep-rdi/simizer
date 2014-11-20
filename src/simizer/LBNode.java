@@ -96,5 +96,7 @@ public class LBNode extends Node  {
        return this.pol;
     }
 
+    @Override
+    public void start() {}
    
 }

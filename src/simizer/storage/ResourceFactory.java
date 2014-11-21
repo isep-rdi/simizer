@@ -2,6 +2,7 @@ package simizer.storage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -131,23 +132,38 @@ public class ResourceFactory {
   }
 
   /**
-   * BROKEN
+   * Returns up to {@code numberOfKeys} starting resources.
+   * <p>
+   * This method will return at most {@code numberOfResources} resources from
+   * the {@code ResourceFactory}.  If there aren't {@code numberOfResources}
+   * resources left in the factory, then a smaller number will be returned.
+   * <p>
+   * A call to this method is destructive, meaning that it "removes" elements
+   * from future calls to this method and {@link #getStartList()}.  This makes
+   * it useful for assigning a different set of resources to distinct storage
+   * elements.
+   * <p>
+   * However, note that resources are recreated when they are specifically
+   * requested by their ID.  Therefore, calling this method has no effect on the
+   * behavior of the {@link #getResource(int)} method.  Also note that the
+   * return value of this method or the {@link #getStartList()} method could be
+   * affected by calls that have been made to the {@link #getResource(int)}
+   * method.
    * 
-   * @param numberOfKeys
-   * @return 
+   * @param numberOfResources the number of resources to return
+   * @return a list containing the IDs for resources from this factory
    */
-  public List<Integer> getStartList(int numberOfKeys) {
-    ArrayList tempList = new ArrayList();
-    Object[] tempArray = resources.keySet().toArray();
+  public List<Integer> getStartList(int numberOfResources) {
+    List<Integer> list = new ArrayList<>();
 
-    for (int eachResource = (resourceCounter % tempArray.length);
-            eachResource < ((resourceCounter + numberOfKeys) % tempArray.length);
-            eachResource++) {
-
-      tempList.add(tempArray[eachResource]);
-      resourceCounter++;
+    Iterator<Integer> iterator = resources.keySet().iterator();
+    while (iterator.hasNext() && numberOfResources > 0) {
+      list.add(iterator.next());
+      iterator.remove();
+      numberOfResources--;
     }
-    return tempList;
+
+    return list;
   }
 
 }

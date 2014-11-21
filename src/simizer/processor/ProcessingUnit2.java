@@ -89,7 +89,7 @@ public class ProcessingUnit2 extends TaskProcessor {
      * @param dt 
      */
     public void onDiskTaskEnded(long timestamp, DiskTask dt) {
-        vmInstance.commitTask(dt);
+        vmInstance.commitDiskTask(dt);
         dt.finishTask();
     }
     /**

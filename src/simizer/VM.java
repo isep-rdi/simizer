@@ -6,6 +6,7 @@ import java.util.Map;
 import simizer.app.Application;
 import simizer.event.*;
 import simizer.network.Message;
+import simizer.network.MessageReceiver;
 import simizer.network.Network;
 import simizer.processor.ProcessingUnit;
 import simizer.processor.tasks.*;
@@ -25,68 +26,120 @@ import simizer.storage.StorageElement;
  *
  * @author slefebvr
  */
-public class VM extends ServerNode {
+public class VM extends Node implements IEventProducer {
 
-  public static double DEFAULT_COST = 15.0; // 15 cents
-  public static long DEFAULT_MEM_SZ = 1024 * 1024 * 1024; // 1 GB
+  /** Used to conform to the {@code IEventProducer} protocol. */
+  private final EventProducer eventProducer = new EventProducer();
+
+  /** The default cost associated with a {@code VM} (in cents). */
+  public static final double DEFAULT_COST = 15.0;
+
+  /** The default amount of memory available on a {@code VM} (in bytes). */
+  public static final long DEFAULT_MEMORY_SIZE = StorageElement.GIGABYTE;
 
   protected double hCost = 0.0;
-  protected long memorySize, memoryUsed;
-  protected ProcessingUnit proc;
+  
+  /** The amount of memory (RAM) in use by the {@code Application}s. */
+  protected long memoryUsed;
 
-  protected Map<Integer, Application> idToApp = new HashMap<>();
+  /**
+   * The total amount of memory (RAM) available on the {@code VM}.
+   * <p>
+   * In future versions, this behavior will be changed to use the {@link
+   * IOController} class.  As of now, the value is tracked but not enforced.
+   */
+  protected long memorySize;
+
+  /** The processor for this {@code VM}. */
+  private ProcessingUnit processor;
+
+  /** The long-term storage (hard disk) for this {@code VM}. */
+  private StorageElement disk;
+
+  /** The temporary but faster {@code Cache} for this {@code VM}. */
+  private Cache cache;
+
+  private Map<Integer, Application> idToApp = new HashMap<>();
   private TaskSession currentTaskSession = null;
-  private Cache memory;
+
+  /** Whether or not the {@code VM} has been started. */
   private boolean started = false;
 
-  public VM(int id, Network n, ProcessingUnit p, long memSize,
+
+  // TODO: Need to count the active number of requests.
+  // TODO: getCapacity() returns the number of resources that can be stored on the storage element based on the current average size of resources.
+  // TODO: getNbCores() returns the number of processor cores
+
+  public VM(Integer id, ProcessingUnit processor, StorageElement disk,
+      Network network, long memory, double hCost) {
+
+    super(id, network);
+    this.processor = (processor != null)
+            ? processor
+            : new ProcessingUnit(1, 1000, null);
+    this.disk = (disk != null)
+            ? disk
+            : new StorageElement(1_000_000, 10);
+    this.cache = new Cache(memory, 1);
+    this.memorySize = memory;
+    this.hCost = hCost;
+
+    // give the processor a reference to this VM
+    this.processor.setNodeInstance(this);
+  }
+
+  /** @deprecated */
+  public VM(int id, Network network, ProcessingUnit processor, long memSize,
         StorageElement disk, double hCost) {
 
-    super(id, 0, 0, 0, null, null);
-    setNetwork(n);
-    this.proc = p;
-    this.memorySize = memSize;
-    this.memory = new Cache(memorySize, 1);
-    this.disk = disk;
-    this.hCost = hCost;
-    proc.setNodeInstance(this);
+    this(id, processor, disk, network, memSize, hCost);
   }
 
   /**
    * Default constructor, with default processor and default cost.
    *
    * @param id
-   * @param n
+   * @param network
    */
-  public VM(int id, Network n) {
-    this(id,
-        n,
-        new ProcessingUnit(1, 1000, null),
-        DEFAULT_MEM_SZ,
-        new StorageElement(1000000, 10),
-        DEFAULT_COST);
+  public VM(int id, Network network) {
+    this(id, network, null, DEFAULT_MEMORY_SIZE, null, DEFAULT_COST);
+  }
 
+  public ProcessingUnit getProcessingUnit() {
+    return this.processor;
+  }
+
+  public long getClock() {
+    return this.clock;
   }
 
   /**
-   * Deploys the given application instance on the VM
+   * Deploys the specified {@code Application} on this {@code VM}.
+   * <p>
+   * If the {@code VM} has already been started, then the {@link Application}
+   * will be started when it is deployed.  Otherwise, the {@link Application}
+   * will be started when the {@code VM} is started.
    *
-   * @param app
+   * @param application the {@link Application} to deploy
    */
-  public void deploy(Application app) {
-    app.setVM(this);
-    idToApp.put(app.getId(), app);
-    memoryUsed += app.getMemorySize();
+  public void deploy(Application application) {
+    application.setVM(this);
+    idToApp.put(application.getId(), application);
+    memoryUsed += application.getMemorySize();
     if (started) {
-      app.init();
+      application.init();
     }
   }
 
+  private void startApplication(Application application) {}
+
   /**
-   * Starts the vm by calling the init() method of all deployed applications.
-   * There is no guarantee on the applications starting order.
-   *
-   * @see Application
+   * Starts the {@code VM} (by starting each {@code Application}).
+   * <p>
+   * The {@link Application}s are started in an arbitrary order.
+   * <p>
+   * The {@link Application}s are started by calling their {@link
+   * Application#init()} method.
    */
   @Override
   public void start() {
@@ -99,79 +152,187 @@ public class VM extends ServerNode {
   }
 
   /**
-   * This method is called when a request is received by the VM. It initiates a
-   * new TaskSession, Identifies the target application of the request and
-   * executes the application handling, and starts task session executions.
+   * Handles {@code Request}s that are received by the {@code VM}.
+   * <p>
+   * It creates a new {@link TaskSession}, identifies the target application of
+   * the {@link Request}, passes execution to the application's {@link
+   * Application#handle(simizer.Node, simizer.requests.Request)} method, and
+   * then starts execution of the {@link TaskSession}.
    *
-   * @see TaskSession
-   * @param orig
-   * @param r
+   * @param source the source {@link Node} of the {@link Request}
+   * @param request the {@link Request} that was sent
    */
   @Override
-  public void onRequestReceived(Node orig, Request r) {
+  public void onRequestReceived(Node source, Request request) {
     initTaskSession();
-    Application app = idToApp.get(r.getAppId());
+    Application app = idToApp.get(request.getAppId());
 
     if (app == null) {
-      r.setError(-1);
-      this.sendResponse(r, orig);
-      executeTaskSession();
-      return;
+      request.setError(-1);
+      this.sendResponse(request, source);
+    } else {
+      app.handle(source, request);
     }
-
-    app.handle(orig, r);
     executeTaskSession();
   }
 
   /**
-   * ServerNode method is to be removed, while waiting for this we switch back
-   * to this model for compatibility between VMs and ServerNode
+   * Sends the specified {@code Request} to the specified {@code Node}.
+   * <p>
+   * This method differs from {@link Network#send(simizer.Node,
+   * simizer.network.MessageReceiver, simizer.requests.Request, long)} in that
+   * it won't use the {@link Network} if the {@code destination} is this {@code
+   * VM}.  This saves time because it is not necessary to send the {@link
+   * Message} over the {@link Network}.
    *
-   * @param timestamp
-   * @param m
+   * @see Network#send(simizer.Node, simizer.network.MessageReceiver, simizer.requests.Request, long)
+   * 
+   * @param destination the destination of the {@link Request}
+   * @param request the {@link Request} to send
+   * @param timestamp the timestamp when the {@link Request} should be sent
    */
-  @Override
-  public void onMessageReceived(long timestamp, Message m) {
-    this.clock = timestamp;
-    onRequestReceived(m.getOrigin(), m.getRequest());
+  public void send(MessageReceiver destination, Request request, long timestamp) {
+    if (destination == this) {
+      Message message = new Message(this, this, request);
 
+      this.registerEvent(
+          new MessageReceivedEvent(timestamp, message, this));
+    } else {
+      getNetwork().send(this, destination, request, timestamp);
+    }
   }
 
   /**
-   * Adds READ task to the current task session.
+   * Computes the data access time for the given {@code DiskTask}.
    *
-   * @param resourceId
-   * @param sz
-   * @return the Resource if success, null if read fails.
-   *
+   * @param task the {@link DiskTask} for which to calculate the length
+   * @return the data access time
    */
-  public Resource read(int resourceId, int sz) {
+  public long getTaskLength(DiskTask task) {
+    int resourceId = task.getResource().getId();
+
+    switch (task.getType()) {
+      case READ:
+        if (cache.contains(resourceId)) {
+          return cache.getReadDelay(resourceId, task.getSize());
+        } else {
+          return disk.getReadDelay(resourceId, task.getSize());
+        }
+
+      case WRITE:
+      case MODIFY:
+        return disk.getWriteDelay(resourceId, task.getSize());
+
+      // This should never happen, unless changes are made and those changes
+      // aren't reflected here.  If that is the case, this will help catch the
+      // bug.
+      default:
+        throw new RuntimeException("Invalid task type.");
+    }
+  }
+
+  /**
+   * Commits the action for the specified {@code DiskTask} to disk.
+   * <p>
+   * After the "delay" for the {@link DiskTask} has finished, this method is
+   * responsible for committing the operation to the permanent storage.  The
+   * changes are not available for reading until they have been committed.
+   * 
+   * @param task the {@link DiskTask} to commit
+   */
+  public void commitDiskTask(DiskTask task) {
+    Resource res = task.getResource();
+
+    switch (task.getType()) {
+      case READ:
+        cache.write(res);
+        break;
+      case WRITE:
+        cache.write(res);
+        disk.write(res);
+        break;
+      case MODIFY:
+        cache.modify(res);
+        disk.modify(res);
+        break;
+    }
+  }
+
+  /**
+   * Initializes a new {@code TaskSession} to schedule {@code Task}s.
+   * <p>
+   * A new {@link TaskSession} is created for each {@link Request} that is
+   * handled.  In addition, a new {@link TaskSession} is created for the
+   * initialization phase of each {@link Application}.
+   */
+  private void initTaskSession() {
+    if (currentTaskSession == null) {
+      currentTaskSession = new TaskSession(0);
+    }
+  }
+
+  /**
+   * Runs the current {@code TaskSession}.
+   * <p>
+   * When a request or initialization operation has finished running, the
+   * associated {@code TaskSession} is given to the {@link TaskProcessor} to be
+   * executed.
+   */
+  private void executeTaskSession() {
+    getProcessingUnit().scheduleTask(currentTaskSession, clock);
+    currentTaskSession = null;
+  }
+
+  /**
+   * Called when the {@code TaskSession} has ended.
+   *
+   * @param taskSession the {@link TaskSession} that ended
+   * @param timestamp the timestamp when the {@link TaskSession} ended
+   */
+  public void endTaskSession(TaskSession taskSession, long timestamp) {
+    this.clock = timestamp;
+  }
+
+  /**
+   * Adds a read {@code Task} to the current {@code TaskSession}.
+   *
+   * @param resourceId the ID of the resource to read
+   * @param size the number of bytes to read.  This parameter does not need to
+   *            be equal to the size of the file.  If it is less than the size
+   *            of the file, it implies that only part of the file is being
+   *            read.
+   * @return the {@link Resource} if the operation is successful, null if it
+   *         fails
+   */
+  public Resource read(int resourceId, int size) {
     Resource res = disk.read(resourceId);
 
     if (res != null) {
-      currentTaskSession.addTask(new DiskTask(this, sz, res, IOType.READ));
+      currentTaskSession.addTask(new DiskTask(this, size, res, IOType.READ));
     }
 
     return res;
   }
 
   /**
-   * @TODO DIRTY, TO REMOVE
-   * @param resourceId
-   * @return
+   * Adds a read {@code Task} to the current {@code TaskSession}.
+   * <p>
+   * This method simulates reading the entire {@link Resource} from the disk.
+   * 
+   * @param resourceId the ID of the resource to read
+   * @return the {@link Resource} if the operation is successful, null if it
+   *         fails
    */
   public Resource read(int resourceId) {
     Resource res = disk.read(resourceId);
-    if (res == null) {
-      return null;
+    if (res != null) {
+      return read(resourceId, (int) res.size());
     }
-    currentTaskSession.addTask(
-            new DiskTask(this, (int) res.size(), res, IOType.READ));
     return res;
   }
 
   /**
-   * Adds a WRITE task to the current session.
+   * Adds a write {@code Task} to the current {@code TaskSession}.
    *
    * If the Resource already exists on the local disk, it is modified.
    *
@@ -214,7 +375,7 @@ public class VM extends ServerNode {
   }
 
   /**
-   * Adds a processing task to the current task session;
+   * Adds a processing {@code Task} to the current {@code TaskSession}.
    *
    * @param nbInstructions
    * @param memSize
@@ -224,45 +385,6 @@ public class VM extends ServerNode {
   public int execute(long nbInstructions, int memSize, List<Resource> res) {
     currentTaskSession.addTask(new ProcTask(nbInstructions, memSize));
     return 0;
-  }
-
-  public void send(Node dest, Request req, long timestamp) {
-    if (dest == this) {
-      //RequestEndedEvent
-      this.registerEvent(
-              new MessageReceivedEvent(
-                      timestamp,
-                      new Message(this, this, req),
-                      this
-              ));
-      return;
-    }
-
-    getNetwork().send(this, dest, req, timestamp);
-  }
-
-  private void initTaskSession() {
-    if (currentTaskSession == null) {
-      currentTaskSession = new TaskSession(0);
-    }
-  }
-
-  /**
-   * Called at the end of request handling Starts task session processing.
-   */
-  private void executeTaskSession() {
-    getProcessingUnit().scheduleTask(currentTaskSession, clock);
-    currentTaskSession = null;
-  }
-
-  /**
-   * Called when task Session has ended
-   *
-   * @param ts
-   * @param timestamp
-   */
-  public void endTaskSession(TaskSession ts, long timestamp) {
-    this.clock = timestamp;
   }
 
   /**
@@ -305,66 +427,29 @@ public class VM extends ServerNode {
     return true;
   }
 
-  /**
-   * Computes data access time for the given disk access task
-   *
-   * @see IOType
-   * @see DiskTask
-   *
-   * @param dt
-   * @return data access time for the given disk access task
-   */
-  public long getTaskLength(DiskTask dt) {
-    long accessTime = 0;
-    int resId = dt.getResource().getId();
-    switch (dt.getType()) {
-      case READ:
-        if (memory.contains(resId)) {
-          return memory.getReadDelay(resId, dt.getSize());
-        } else {
-          return disk.getReadDelay(resId, dt.getSize());
-        }
 
-      case WRITE:
-      case MODIFY:
-        return disk.getWriteDelay(resId, dt.getSize());
-    }
-    return accessTime;
-  }
 
-  public void handleWrite(DiskTask dt) {
-    disk.write(dt.getResource());
+
+
+  @Override
+  public Channel getOutputChannel() {
+    return eventProducer.getOutputChannel();
   }
 
   @Override
-  public void setChannel(Channel c) {
-    super.setChannel(c);
-    proc.setChannel(c);
+  public void registerEvent(Event event) {
+    eventProducer.registerEvent(event);
   }
 
-  public void commitTask(IOTask t) {
-    DiskTask dt = (DiskTask) t;
-    Resource res = dt.getResource();
-    switch (dt.getType()) {
-      case READ:
-        memory.write(res);
-        return;
-      case WRITE:
-        memory.write(res);
-        disk.write(res);
-        return;
-      case MODIFY:
-        memory.modify(res);
-        disk.modify(res);
-    }
+  @Override
+  public boolean cancelEvent(Event event) {
+    return eventProducer.cancelEvent(event);
   }
 
-  public ProcessingUnit getProcessingUnit() {
-    return this.proc;
-  }
-
-  public long getClock() {
-    return this.clock;
+  @Override
+  public void setChannel(Channel channel) {
+    eventProducer.setChannel(channel);
+    processor.setChannel(channel);
   }
 
 }

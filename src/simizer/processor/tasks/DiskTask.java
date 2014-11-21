@@ -80,7 +80,7 @@ public class DiskTask extends IOTask {
    *            from the disk)
    */
   public void onDataReady(long timestamp, DiskTask task) {
-    vm.commitTask(task);
+    vm.commitDiskTask(task);
     finish(timestamp);
   }
 

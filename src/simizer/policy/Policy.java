@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package simizer.policy;
 
 import java.util.List;
@@ -10,17 +6,16 @@ import simizer.Node;
 import simizer.ServerNode;
 import simizer.requests.Request;
 
-/**
- *
- * @author isep
- */
 public interface Policy {
-     public void initialize(List<ServerNode> availableNodes, LBNode lbn);
-     public void addNode(Node n);
-     public void removeNode(Node n);
-     public Node loadBalance(Request r);
-     //ublic void receivedRequest(Node n, Request r);
-     public void printAdditionnalStats();
 
-    //public void addNode(Node orig);
+  public void initialize(List<ServerNode> availableNodes, LBNode loadBalancer);
+
+  public void addNode(Node node);
+
+  public void removeNode(Node node);
+
+  public Node loadBalance(Request request);
+
+  public void printAdditionnalStats();
+
 }

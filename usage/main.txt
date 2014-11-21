@@ -1,0 +1,8 @@
+Usage: <simizer> <command> [arguments...]
+
+  where <command> can be:
+    generate: create a trace file
+    run: run a simulation using a trace file
+    clientSim: unknown behavior <deprecated>
+
+  to see the arguments for each command, run that command with no arguments

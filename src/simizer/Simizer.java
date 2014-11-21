@@ -2,6 +2,8 @@ package simizer;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -37,43 +39,55 @@ public class Simizer {
   static long endTime = 0;
 
   public static void main(String[] args) {
-    // 4 fichiers:
-    String command = args[0];
+    if (args.length >= 1) {
+      handleCommand(args[0], Arrays.copyOfRange(args, 1, args.length));
+    } else {
+      printUsage("main");
+    }
+  }
 
+  public static void printUsage(String name) {
+    try {
+      InputStream stream = ClassLoader.getSystemResourceAsStream(name + ".txt");
+
+      byte[] buffer = new byte[1024];
+      while (true) {
+        int count = stream.read(buffer);
+        if (count <= 0) break;
+        System.out.write(buffer, 0, count);
+      }
+
+      stream.close();
+    } catch (Exception e) {
+      System.err.println("Could not print usage information.");
+    }
+  }
+
+  private static void handleCommand(String command, String[] args) {
     switch (command) {
       case "generate":
-        String lawConfFile = args[1];
-        String rDescFile = args[2];
-        int nbUsers = Integer.parseInt(args[3]);
-        int maxReq = Integer.parseInt(args[4]);
-        int interval = Integer.parseInt(args[5]);
-        // generate wl.conf ./reqDescription_v2.csv 100 1000 30
-        generate(lawConfFile, rDescFile, nbUsers, maxReq, interval);
-
+        if (args.length < 5) {
+          printUsage("generate");
+        } else {
+          generate(args);
+        }
         break;
-      case "run":
-        String nodeFile = args[1]; // fichier de description des noeuds
-        String reqDesc = args[2]; // description des requêtes;
-        String workload = args[3]; // description de la workload
-        String resFile = args[4]; // desc des ressources
-        String policyName = args[5]; // lb policy classname
-        // run ./5nodes.json ./reqDescription_v1.csv ./workload_gene_v1.csv ./test Simizer.policies.CawaDyn
-        run(nodeFile, reqDesc, workload, resFile, policyName);
 
+      case "run":
+        if (args.length < 5) {
+          printUsage("run");
+        } else {
+          run(args);
+        }
         break;
 
       case "clientSim":
-        lawConfFile = args[1];
-        reqDesc = args[2];
-        resFile = args[3];
-        nodeFile = args[4];
-        policyName = args[5];
-        long endSim = Long.parseLong(args[6]);
-        int maxUsers = Integer.parseInt(args[7]);
-        //clientSim wl.conf  ./reqDescription_image_v2.csv ./ressources.json ./10nodes.json simizer.policies.RoundRobin 180000 15
-        runClientSim(lawConfFile, reqDesc, resFile, nodeFile, policyName, endSim, maxUsers);
+        if (args.length < 7) {
+          printUsage("clientSim");
+        } else {
+          clientSim(args);
+        }
     }
-
   }
 
   public static Queue<Request> getRequestQueue(String requestfile, String requestDescFile) {
@@ -99,6 +113,16 @@ public class Simizer {
 
   }
   // Missing resource description
+
+  private static void run(String[] args) {
+    String nodeFile = args[0]; // fichier de description des noeuds
+    String reqDesc = args[1]; // description des requêtes;
+    String workload = args[2]; // description de la workload
+    String resFile = args[3]; // desc des ressources
+    String policyName = args[4]; // lb policy classname
+    // run ./5nodes.json ./reqDescription_v1.csv ./workload_gene_v1.csv ./test Simizer.policies.CawaDyn
+    run(nodeFile, reqDesc, workload, resFile, policyName);
+  }
 
   public static void run(String nodeFile, String reqDesc, String wlFile, String resFile, String policyName) {
 
@@ -209,6 +233,32 @@ public class Simizer {
     es.shutdown();
   }
 
+  private static void generate(String[] args) {
+    String lawConfFile = args[0];
+    String rDescFile = args[1];
+    int nbUsers = Integer.parseInt(args[2]);
+    int maxReq = Integer.parseInt(args[3]);
+    int interval = Integer.parseInt(args[4]);
+    // generate wl.conf ./reqDescription_v2.csv 100 1000 30
+    generate(lawConfFile, rDescFile, nbUsers, maxReq, interval);
+  }
+
+  // define a class to aid in the generation of requests
+  static class SimpleClient implements Comparable<SimpleClient> {
+    public final Integer id;
+    public final long timestamp;
+
+    public SimpleClient(Integer id, long timestamp) {
+      this.id = id;
+      this.timestamp = timestamp;
+    }
+
+    @Override
+    public int compareTo(SimpleClient second) {
+      return Long.compare(this.timestamp, second.timestamp);
+    }
+  }
+
   static public void generate(String lawConf, String rDescFile, int nbUsers, int maxReq, int interval) {
 
     Map<String, Law> lawMap = loadLaws(lawConf);
@@ -220,35 +270,73 @@ public class Simizer {
       System.exit(0);
     }
 
+
+    PriorityQueue<SimpleClient> clients = new PriorityQueue<>(nbUsers);
+
     // User vs its current time
-    Map<Integer, Long> userTime = new HashMap<Integer, Long>();
-    int nbReq = 0, totalUsers = 0;
+    int requests = 0;
+    long intervalTimestamp = 0;
 
-    long currentTime = 0;
-    while (nbReq < maxReq) {
-      // user arrivals:
-      if (totalUsers < nbUsers) {
-        int newUsers = lawMap.get("arrivalLaw").nextValue();
-        // ajout des nouveaux utilisateurs
-        for (int i = totalUsers; i < (totalUsers + newUsers); i++) {
-          userTime.put(i, currentTime);
-
-        }
+    while (true) {
+      // we have processed all of the requests
+      if (requests == maxReq) {
+        break;
       }
 
-      // new requests
-      for (int i = 0; i < userTime.size(); i++) {
-        if (userTime.get(i) <= currentTime) {
-          Request r = rf.getRequest(userTime.get(i), lawMap.get("requestLaw").nextValue());
-          System.out.println(r.getId() + ";" + r.getArTime() + ";" + r.getTypeId());
-          // schedule next request
-          userTime.put(i, userTime.get(i) + lawMap.get("thinkTimeLaw").nextValue());
-          nbReq++;
-        }
+      SimpleClient next = clients.peek();
+
+      // If the clients list is empty, it means that we haven't created any
+      // clients yet.  If this is the case, simulate having an event that will
+      // trigger client creation.  Note that if the law doesn't create any
+      // clients, the code will try again at the next interval.  If the law
+      // always returns zero, then this will create an infinite loop.
+      if (clients.isEmpty()) {
+        next = new SimpleClient(0, intervalTimestamp);
       }
 
-      currentTime += interval;
+      // there is nothing left to process
+      if (next == null) {
+        break;
+      }
+
+      // if it's time to create clients AND we haven't created all the clients
+      if (next.timestamp >= intervalTimestamp && clients.size() < nbUsers) {
+        addSimpleClients(clients, lawMap.get("arrivalLaw"), intervalTimestamp, nbUsers);
+        intervalTimestamp += interval;
+        continue;  // we could have added a client with an earlier timestamp
+      }
+
+      clients.poll();  // remove the element now that we know it's correct
+      Request r = rf.getRequest(next.timestamp, lawMap.get("requestLaw").nextValue());
+      System.out.println(r.getId() + ";" + r.getArTime() + ";" + r.getTypeId() + ";" + next.id);
+
+      clients.offer(new SimpleClient(next.id, next.timestamp + lawMap.get("thinkTimeLaw").nextValue()));
+      requests++;
     }
+  }
+
+  private static void addSimpleClients(PriorityQueue<SimpleClient> clients,
+      Law law, long timestamp, int maximumClientCount) {
+
+    // make sure that we don't exceed the maximum client count
+    int current = clients.size();
+    int count = Math.min(law.nextValue() + current, maximumClientCount);
+
+    for (int i = current; i < count; i++) {
+      clients.offer(new SimpleClient(i, timestamp));
+    }
+  }
+
+  private static void clientSim(String[] args) {
+    String lawConfFile = args[0];
+    String reqDesc = args[1];
+    String resFile = args[2];
+    String nodeFile = args[3];
+    String policyName = args[4];
+    long endSim = Long.parseLong(args[5]);
+    int maxUsers = Integer.parseInt(args[6]);
+    //clientSim wl.conf  ./reqDescription_image_v2.csv ./ressources.json ./10nodes.json simizer.policies.RoundRobin 180000 15
+    runClientSim(lawConfFile, reqDesc, resFile, nodeFile, policyName, endSim, maxUsers);
   }
 
   /**

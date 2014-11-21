@@ -114,43 +114,12 @@ public class ServerNode extends Node
     return (int) (this.memSize / moy);
   }
 
-  public long getMemorySize() {
-    return this.memSize;
-  }
-
   public int getNbCores() {
     return this.processor.getNbCores();
   }
 
-  public void store(Request r) {
-    disk.write(r.getResources());
-  }
-
-  public boolean isstored(Request r) {
-    boolean result = disk.contains(r.getResources());
-    return result;
-  }
-
   public StorageElement getStorageElement() {
     return disk;
-  }
-
-  public static void setRessourceFactory(ResourceFactory resFac) {
-    rf = resFac;
-  }
-
-  // based on rough core 2 duo evaluation
-
-  public static double getCoef(int nbReq, int nbCores) {
-
-    final double base = 1.068, overhead = 0.184;
-    final double coef = 1 + ((base / nbCores * nbReq) + overhead);
-
-    if (coef < 1.0) {
-      return (base);
-    }
-
-    return (coef);
   }
 
   public void setFrontendNode(final LBNode lbn) {

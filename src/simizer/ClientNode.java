@@ -2,6 +2,7 @@ package simizer;
 
 import simizer.laws.Law;
 import simizer.network.Message;
+import simizer.network.MessageReceiver;
 import simizer.network.Network;
 import simizer.requests.Request;
 import simizer.requests.RequestFactory;
@@ -14,7 +15,8 @@ import simizer.requests.RequestFactory;
  * <p>
  * It is also possible to create {@code ClientNode} instances that send a
  * specified number of requests, rather than sending requests for some duration
- * of time.
+ * of time.  See {@link #ClientNode(java.lang.Integer, simizer.network.Network,
+ * long, int)}.
  *
  * @author Sylvain Lefebvre
  */
@@ -50,13 +52,28 @@ public class ClientNode extends Node {
     ClientNode.thinkTimeLaw = thinkTimeLaw;
   }
 
+  /** The timestamp when the client starts its execution. */
   private long startTime;
+
+  /**
+   * The timestamp when the client should finish its execution.
+   * <p>
+   * This value only has significance when {@code requestsToSend} is {@code
+   * null}.
+   */
   private long endTime;
+
+  /** Whether or not the client has finished its execution. */
   private boolean ended = false;
+
+  /** The number of requests sent by the client. */
   private int requestCount;
+
+  /** The number of requests that the client should send before terminating. */
   private Integer requestsToSend = null;
 
-  protected Node serviceAddress;
+  /** The address where the client should send its requests. */
+  protected MessageReceiver serviceAddress;
 
   /**
    * Creates a client that sends requests until it expires.
@@ -100,14 +117,34 @@ public class ClientNode extends Node {
     start();
   }
 
-  public void setServiceAddress(Node serviceNode) {
-    this.serviceAddress = serviceNode;
+  /**
+   * Changes the address where the client should send its {@code Request}s.
+   *
+   * @param receiver the {@link MessageReceiver} where the client should send
+   *            its {@link Request}s
+   */
+  public void setServiceAddress(MessageReceiver receiver) {
+    this.serviceAddress = receiver;
   }
 
+  /**
+   * Returns the timestamp when the client will finish.
+   *
+   * @return the timestamp when the client will finish
+   */
   public long getEndTime() {
     return this.endTime;
   }
 
+  /**
+   * Returns whether or not the client has finished.
+   * <p>
+   * Note that a client may not be finished even if the clock for the simulation
+   * has advanced beyond {@link #getEndTime()} because the client may still be
+   * waiting for a response to a previous request.
+   *
+   * @return whether or not the client has finished
+   */
   public boolean getEnded() {
     return this.ended;
   }

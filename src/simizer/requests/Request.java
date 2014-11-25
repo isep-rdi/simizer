@@ -32,8 +32,10 @@ public class Request {
   /** The delay from the load balancing code (measured in nanoseconds). */
   private long loadBalancingDelayNS = 0;
 
-  double cost = 0.0;
   protected String type;
+  /** The cost associated with the {@code Request}. */
+  private double cost = 0.0;
+
   int error = 0;
 
   private int size;
@@ -156,10 +158,20 @@ public class Request {
     this.loadBalancingDelayNS = nanoseconds;
   }
 
+  /**
+   * Sets the cost associated with this {@code Request}.
+   *
+   * @param cost the cost to associated with this {@code Request}
+   */
   public void setCost(double cost) {
     this.cost = cost;
   }
 
+  /**
+   * Returns the cost associated with this {@code Request}.
+   *
+   * @return the cost associated with this {@code Request}
+   */
   public double getCost() {
     return this.cost;
   }

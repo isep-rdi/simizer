@@ -1,0 +1,4 @@
+Usage: <simizer> clientSim [arguments...]
+
+  This functionality is not yet implemented.
+

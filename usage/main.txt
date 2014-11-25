@@ -6,3 +6,4 @@ Usage: <simizer> <command> [arguments...]
     clientSim: unknown behavior <deprecated>
 
   to see the arguments for each command, run that command with no arguments
+

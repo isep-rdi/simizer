@@ -3,31 +3,31 @@ Usage: <simizer> generate [arguments...]
 The required five arguments are specified in the following order:
 
   law_file
-      A Java Properties file describing the laws used by the application.
+    A Java Properties file describing the laws used by the application.
 
-      The file should have one entry per line, where each entry is of the form
-        <key>=<value>
+    The file should have one entry per line, where each entry is of the form
+      <key>=<value>
 
-      arrivalLaw
-        A Law definition describing the number of clients that arrive at the
-        beginning of each interval.
+    arrivalLaw
+      A Law definition describing the number of clients that arrive at the
+      beginning of each interval.
 
-      requestLaw
-        A Law definition describing which request template a client will choose.
+    requestLaw
+      A Law definition describing which request template a client will choose.
 
-      thinkTimeLaw
-        A Law describing the amount of time between requests for each client.
+    thinkTimeLaw
+      A Law describing the amount of time between requests for each client.
 
   requests_file
-      a file describing the requests available for use in the simulation
+    a file describing the requests available for use in the simulation
 
   clients
-      The maximum number of clients that can be created during the simulation.
+    The maximum number of clients that can be created during the simulation.
 
   requests
-      The number of requests that will be "sent" during the simulation.
+    The number of requests that will be "sent" during the simulation.
 
   interval
-      The client creation interval.  At the beginning of each interval, clients
-      are created according to the specified arrivalLaw.
+    The client creation interval.  At the beginning of each interval, clients
+    are created according to the specified arrivalLaw.
 

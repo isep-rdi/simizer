@@ -1,0 +1,4 @@
+Usage: <simizer> run [arguments...]
+
+  This functionality is not yet implemented.
+

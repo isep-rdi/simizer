@@ -29,7 +29,9 @@ public class Request {
   /** The delay that comes as a result of {@code Network} delays. */
   private long networkDelay = 0;
 
-  long fwdTime = 0;
+  /** The delay from the load balancing code (measured in nanoseconds). */
+  private long loadBalancingDelayNS = 0;
+
   double cost = 0.0;
   protected String type;
   int error = 0;
@@ -141,6 +143,19 @@ public class Request {
     networkDelay += delay;
   }
 
+  /**
+   * Sets the load balancing delay.
+   * <p>
+   * In order to accurately measure the time taken by the various load balancing
+   * algorithms, this value is measured as accurately as possible.  It is
+   * measured in nanoseconds to provide enough granularity.
+   *
+   * @param nanoseconds the amount of the delay, measured in nanoseconds
+   */
+  public void setLoadBalancingDelayNS(long nanoseconds) {
+    this.loadBalancingDelayNS = nanoseconds;
+  }
+
   public void setCost(double cost) {
     this.cost = cost;
   }
@@ -161,7 +176,7 @@ public class Request {
             + ";" + serverFinishTimestamp
             + ";" + networkDelay
             + ";" + node
-            + ";" + fwdTime
+            + ";" + loadBalancingDelayNS
             + ";" + cost
             + ";" + error + "r");
   }
@@ -227,10 +242,6 @@ public class Request {
 
   public void setError(int count) {
     this.error = count;
-  }
-
-  public void setFwdTime(long l) {
-    this.fwdTime = l;
   }
 
   public long getNbInst() {

@@ -77,8 +77,8 @@ public class SendTask extends IOTask {
   public void run(TaskProcessor processor, long timestamp) {
     super.run(processor, timestamp);
     
-    if (request.getArTime() == -1) {
-      request.setArtime(timestamp);
+    if (request.getClientStartTimestamp() == -1) {
+      request.setClientStartTimestamp(timestamp);
     } else {
       request.setFinishTime(timestamp);
     }

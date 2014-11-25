@@ -189,12 +189,12 @@ public class ClientNode extends Node {
   @Override
   public void onMessageReceived(long timestamp, Message message) {
     Request r = message.getRequest();
-    if (timestamp - r.getArTime() < 0) {
+    if (timestamp - r.getClientStartTimestamp() < 0) {
       System.out.println("PROBLEM");
     }
 
     System.out.println(r.toString()
-        + ";" + (timestamp - r.getArTime())
+        + ";" + (timestamp - r.getClientStartTimestamp())
         + ";" + getId());
 
     if (requestsToSend != null) {

@@ -13,7 +13,10 @@ public class Request {
   private List<Integer> rscList;
   protected int typeId;
   long procTime;
-  long artime;
+
+  /** The timestamp when the client starts sending the {@code Request}. */
+  private long clientStartTimestamp;
+
   long ftime;
   long delay = 0;
   long fwdTime = 0;
@@ -27,7 +30,7 @@ public class Request {
       String type, long nbInst) {
 
     this.id = id;
-    this.artime = artime;
+    this.clientStartTimestamp = artime;
     this.type = type;
     this.typeId = typeId;
     this.params = params;
@@ -43,7 +46,7 @@ public class Request {
    */
   public Request(Request r) {
     this.id = -1;
-    this.artime = -1;
+    this.clientStartTimestamp = -1;
     this.node = 0;
     this.cost = r.cost;
     this.params = r.params;
@@ -61,8 +64,32 @@ public class Request {
     return this.id;
   }
 
-  public void setArtime(long artime) {
-    this.artime = artime;
+  /**
+   * Returns the timestamp when the client first sent the {@code Request}.
+   * <p>
+   * When a client first hands a {@code Request} to the {@link Network} to be
+   * sent, this value should be set to the current timestamp.  It can therefore
+   * be used to measure the round-trip time of the entire request.
+   * 
+   * @return the timestamp when the client first sent the {@code Request}
+   */
+  public long getClientStartTimestamp() {
+    return clientStartTimestamp;
+  }
+
+  /**
+   * Sets the timestamp when the client first sent the {@code Request}.
+   * <p>
+   * This value should only be set once per {@code Request}.
+   * <p>
+   * For a more in-depth description of the value, see {@link
+   * #getClientStartTimestamp()}.
+   *
+   * @param clientStartTimestamp the timestamp when the client first sent the
+   *            {@code Request}
+   */
+  public void setClientStartTimestamp(long clientStartTimestamp) {
+    this.clientStartTimestamp = clientStartTimestamp;
   }
 
   public void setCost(double cost) {
@@ -84,7 +111,7 @@ public class Request {
   @Override
   public String toString() {
     return (id
-            + ";" + artime
+            + ";" + clientStartTimestamp
             + ";" + params
             + ";" + ftime
             + ";" + delay
@@ -106,10 +133,6 @@ public class Request {
   // changed.
   public final List<Integer> getResources() {
     return this.rscList;
-  }
-
-  public long getArTime() {
-    return artime;
   }
 
   public long getFtime() {
@@ -230,7 +253,7 @@ public class Request {
    */
   public Request(long id, int typeId, long artime, String params, long procTime, String type) {
     this.id = id;
-    this.artime = artime;
+    this.clientStartTimestamp = artime;
     this.type = type;
     this.typeId = typeId;
     this.params = params;
@@ -260,7 +283,7 @@ public class Request {
   public Request(long id, long procTime, long arTime, int node) {
     this.id = id;
     this.node = node;
-    this.artime = arTime;
+    this.clientStartTimestamp = arTime;
     this.procTime = procTime;
     this.ftime = -1;
 
@@ -277,7 +300,7 @@ public class Request {
   public Request(long id, long artime, long procTime, int node, float cost, String params) {
 
     this.id = id;
-    this.artime = artime;
+    this.clientStartTimestamp = artime;
     this.node = node;
     this.procTime = procTime;
     this.cost = cost;
@@ -299,7 +322,7 @@ public class Request {
   public Request(long id, long artime, int node, float cost, String params) {
 
     this.id = id;
-    this.artime = artime;
+    this.clientStartTimestamp = artime;
     this.node = node;
     this.cost = cost;
     this.params = params;

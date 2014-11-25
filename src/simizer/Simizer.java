@@ -160,7 +160,7 @@ public class Simizer {
 
       clients.poll();  // remove the element now that we know it's correct
       Request r = rf.getRequest(next.timestamp, lawMap.get("requestLaw").nextValue());
-      System.out.println(r.getId() + ";" + r.getArTime() + ";" + r.getTypeId() + ";" + next.id);
+      System.out.println(r.getId() + ";" + r.getClientStartTimestamp() + ";" + r.getTypeId() + ";" + next.id);
 
       clients.offer(new SimpleClient(next.id, next.timestamp + lawMap.get("thinkTimeLaw").nextValue()));
       requests++;

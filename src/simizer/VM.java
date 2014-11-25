@@ -430,7 +430,7 @@ public class VM extends Node implements IEventProducer {
    * @param req
    */
   public boolean sendRequest(Node dest, Request req) {
-    //req.setArtime(clock);
+    //req.setClientStartTimestamp(clock);
     if (getNetwork().getNode(dest.getId()) != null) {
       currentTaskSession.addTask(new SendTask(req, dest, this));
       // currentTaskSession.complete();
@@ -449,7 +449,7 @@ public class VM extends Node implements IEventProducer {
    * @param req
    */
   public boolean sendResponse(Request req, Node dest) {
-    if (getNetwork().getNode(dest.getId()) == null || req.getArTime() < 0) {
+    if (getNetwork().getNode(dest.getId()) == null || req.getClientStartTimestamp() < 0) {
       return false;
     }
 

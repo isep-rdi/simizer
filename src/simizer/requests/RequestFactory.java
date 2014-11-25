@@ -133,7 +133,7 @@ public class RequestFactory {
    */
   public Request getRequest(long arrivalTime, Integer templateId) {
     Request request = new Request(templates.get(templateId));
-    request.setArtime(arrivalTime);
+    request.setClientStartTimestamp(arrivalTime);
     request.setId(counter++);
     return request;
   }

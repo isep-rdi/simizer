@@ -54,21 +54,38 @@ public class ClientNode extends Node {
   private long endTime;
   private boolean ended = false;
   private int requestCount;
-  private final int MAX_REQ = 10;
+  private Integer requestsToSend = null;
 
   protected Node serviceAddress;
 
   /**
-   * Creates a new Client with its arrival time and network, Automatically
-   * computes the session duration for the client.
+   * Creates a client that sends requests until it expires.
+   * <p>
+   * Clients expire after an amount of time defined by the {@code durationLaw}.
+   * See {@link #configureLaws(simizer.laws.Law, simizer.laws.Law,
+   * simizer.laws.Law)} for a description of the laws.
    *
-   * @param id - long
-   * @param startTime
-   * @param network
+   * @param id the ID of the client
+   * @param network the {@link Network} that the client should use
+   * @param startTime the time when the client should begin its operations
    */
-  public ClientNode(int id, Network network, long startTime) {
+  public ClientNode(Integer id, Network network, long startTime) {
     super(id, network);
     this.startTime = startTime;
+  }
+
+  /**
+   * Creates a client that sends a specific number of requests.
+   *
+   * @param id the ID of the client
+   * @param network the {@link Network} that the client should use
+   * @param startTime the time when the client should begin its operations
+   * @param requests the number of requests that the client should send before
+   *            ending its execution
+   */
+  public ClientNode(Integer id, Network network, long startTime, int requests) {
+    this(id, network, startTime);
+    this.requestsToSend = requests;
   }
 
   /**
@@ -100,9 +117,14 @@ public class ClientNode extends Node {
    */
   @Override
   public void start() {
-    // determine the end time of the client
-    this.endTime = startTime + durationLaw.nextValue();
-    requestCount = 0;
+    if (requestsToSend != null) {
+      // reset the request counter if that is the mode of the client
+      requestCount = 0;
+    } else {
+      // determine the end time of the client (for this mode)
+      this.endTime = startTime + durationLaw.nextValue();
+    }
+    
     scheduleNextRequest(this.startTime);
   }
 
@@ -137,13 +159,21 @@ public class ClientNode extends Node {
     System.out.println(r.toString()
         + ";" + (timestamp - r.getArTime())
         + ";" + getId());
-    
-    //if(timestamp < endTime)
-    requestCount++;
-    if (requestCount < MAX_REQ) {
-      scheduleNextRequest(timestamp);
+
+    if (requestsToSend != null) {
+      // if the number of requests to send is set, use that method
+      if (requestCount >= requestsToSend) {
+        ended = true;
+      }
     } else {
-      ended = true;
+      // otherwise, we want to rely on the calculated endTime
+      if (timestamp >= endTime) {
+        ended = true;
+      }
+    }
+
+    if (!ended) {
+      scheduleNextRequest(timestamp);
     }
   }
 

@@ -80,7 +80,7 @@ public class SendTask extends IOTask {
     if (request.getClientStartTimestamp() == -1) {
       request.setClientStartTimestamp(timestamp);
     } else {
-      request.setFinishTime(timestamp);
+      request.setServerFinishTimestamp(timestamp);
     }
 
     vm.send(destination, request, timestamp);

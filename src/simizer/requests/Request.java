@@ -17,7 +17,15 @@ public class Request {
   /** The timestamp when the client starts sending the {@code Request}. */
   private long clientStartTimestamp;
 
-  long ftime;
+  /**
+   * The timestamp when the server finishes processing the {@code Request}.
+   * <p>
+   * This is the timestamp when it hands the response to the {@link Network} to
+   * be sent back to the client.  It is not the end of the request-response
+   * cycle because the response still needs to reach the client.
+   */
+  private long serverFinishTimestamp;
+  
   long delay = 0;
   long fwdTime = 0;
   double cost = 0.0;
@@ -52,7 +60,7 @@ public class Request {
     this.params = r.params;
     this.procTime = r.procTime;
     this.rscList = r.rscList;
-    this.ftime = 0;
+    this.serverFinishTimestamp = 0;
     this.type = r.type;
     this.typeId = r.typeId;
     this.error = 0;
@@ -92,6 +100,27 @@ public class Request {
     this.clientStartTimestamp = clientStartTimestamp;
   }
 
+  /**
+   * Returns the timestamp when the server finished processing the {@code
+   * Request}.
+   *
+   * @return the timestamp when the server finished processing the {@code
+   *             Request}
+   */
+  public long getServerFinishTimestamp() {
+    return serverFinishTimestamp;
+  }
+
+  /**
+   * Sets the timestamp when the server finishes processing the {@code Request}.
+   *
+   * @param serverFinishTimestamp the timestamp when the server finishes processing
+   *            the {@code Request}
+   */
+  public void setServerFinishTimestamp(long serverFinishTimestamp) {
+    this.serverFinishTimestamp = serverFinishTimestamp;
+  }
+
   public void setCost(double cost) {
     this.cost = cost;
   }
@@ -104,16 +133,12 @@ public class Request {
     return this.params;
   }
 
-  public void setFinishTime(long ftime) {
-    this.ftime = ftime;
-  }
-
   @Override
   public String toString() {
     return (id
             + ";" + clientStartTimestamp
             + ";" + params
-            + ";" + ftime
+            + ";" + serverFinishTimestamp
             + ";" + delay
             + ";" + node
             + ";" + fwdTime
@@ -133,10 +158,6 @@ public class Request {
   // changed.
   public final List<Integer> getResources() {
     return this.rscList;
-  }
-
-  public long getFtime() {
-    return ftime;
   }
 
   public long getDelay() {
@@ -271,7 +292,7 @@ public class Request {
     this.id = id;
     this.params = params;
     this.procTime = procTime;
-    this.ftime = -1;
+    this.serverFinishTimestamp = -1;
   }
 
   /**
@@ -285,7 +306,7 @@ public class Request {
     this.node = node;
     this.clientStartTimestamp = arTime;
     this.procTime = procTime;
-    this.ftime = -1;
+    this.serverFinishTimestamp = -1;
 
   }
 
@@ -306,7 +327,7 @@ public class Request {
     this.cost = cost;
     this.params = params;
     this.rscList = parseResources(params);
-    this.ftime = -1;
+    this.serverFinishTimestamp = -1;
   }
 
   /**

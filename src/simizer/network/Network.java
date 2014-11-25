@@ -76,7 +76,7 @@ public class Network extends EventProducer {
 
     // add the delay to the message
     long delay = this.generateNextDelay();
-    request.setDelay(request.getDelay() + delay);
+    request.addNetworkDelay(delay);
 
     // send it to the destination
     Message m = new Message(source, destination, request);

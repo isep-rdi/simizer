@@ -25,8 +25,10 @@ public class Request {
    * cycle because the response still needs to reach the client.
    */
   private long serverFinishTimestamp;
-  
-  long delay = 0;
+
+  /** The delay that comes as a result of {@code Network} delays. */
+  private long networkDelay = 0;
+
   long fwdTime = 0;
   double cost = 0.0;
   protected String type;
@@ -121,6 +123,24 @@ public class Request {
     this.serverFinishTimestamp = serverFinishTimestamp;
   }
 
+  /**
+   * Returns the current delay imposed by {@code Network}s.
+   *
+   * @return the current delay imposed by {@code Network}s
+   */
+  public long getNetworkDelay() {
+    return networkDelay;
+  }
+
+  /**
+   * Adds the specified value to the total delay from {@code Network}s.
+   *
+   * @param delay the amount by which the network delay should be increased
+   */
+  public void addNetworkDelay(long delay) {
+    networkDelay += delay;
+  }
+
   public void setCost(double cost) {
     this.cost = cost;
   }
@@ -139,7 +159,7 @@ public class Request {
             + ";" + clientStartTimestamp
             + ";" + params
             + ";" + serverFinishTimestamp
-            + ";" + delay
+            + ";" + networkDelay
             + ";" + node
             + ";" + fwdTime
             + ";" + cost
@@ -158,10 +178,6 @@ public class Request {
   // changed.
   public final List<Integer> getResources() {
     return this.rscList;
-  }
-
-  public long getDelay() {
-    return delay;
   }
 
   public String[] getParamsStr() {
@@ -186,14 +202,6 @@ public class Request {
 
   public void setNode(int nId) {
     this.node = nId;
-  }
-
-  public void setDelay(long l) {
-    if (l < this.delay) {
-      System.out.println("Wrong delay");
-    } else {
-      this.delay = l;
-    }
   }
 
   public long getProcTime() {

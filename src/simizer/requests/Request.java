@@ -36,7 +36,8 @@ public class Request {
   /** The cost associated with the {@code Request}. */
   private double cost = 0.0;
 
-  int error = 0;
+  /** The number of errors that have occurred for this {@code Request}. */
+  private int errorCount = 0;
 
   private int size;
 
@@ -69,7 +70,7 @@ public class Request {
     this.serverFinishTimestamp = 0;
     this.type = r.type;
     this.typeId = r.typeId;
-    this.error = 0;
+    this.errorCount = 0;
 
     this.nbInstructions = r.nbInstructions;
   }
@@ -176,6 +177,29 @@ public class Request {
     return this.cost;
   }
 
+  /**
+   * Returns the number of errors that have occurred.
+   *
+   * @return the number of errors that have occurred
+   */
+  public int getErrorCount() {
+    return this.errorCount;
+  }
+
+  /**
+   * Reports errors for this {@code Request}.
+   * <p>
+   * The {@code Request} object keeps a running tally of the number of errors
+   * that have occurred.  Each time an errorCount occurred, it should be
+   * reported using this method.
+   *
+   * @param count the number of errors to report.  This value is added to the
+   *            running total of errors that have occurred.
+   */
+  public void reportErrors(int count) {
+    this.errorCount += count;
+  }
+
   public String getParameters() {
     return this.params;
   }
@@ -190,7 +214,7 @@ public class Request {
             + ";" + node
             + ";" + loadBalancingDelayNS
             + ";" + cost
-            + ";" + error + "r");
+            + ";" + errorCount + "r");
   }
 
   public String display() {
@@ -246,14 +270,6 @@ public class Request {
 
   public Integer getNodeId() {
     return this.node;
-  }
-
-  public int getError() {
-    return this.error;
-  }
-
-  public void setError(int count) {
-    this.error = count;
   }
 
   public long getNbInst() {

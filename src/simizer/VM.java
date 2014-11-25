@@ -183,7 +183,7 @@ public class VM extends Node implements IEventProducer {
     Application app = idToApp.get(request.getAppId());
 
     if (app == null) {
-      request.setError(-1);
+      request.reportErrors(1);
       this.sendResponse(request, source);
     } else {
       app.handle(source, request);

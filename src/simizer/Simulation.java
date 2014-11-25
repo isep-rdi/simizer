@@ -33,6 +33,15 @@ public class Simulation {
   }
 
   /**
+   * Returns the timestamp when the simulation should end.
+   *
+   * @return the timestamp when the simulation should end
+   */
+  public long getEndTimestamp() {
+    return endSim;
+  }
+
+  /**
    * Loads entities from the specified configuration file.
    *
    * @param nodeFilePath

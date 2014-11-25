@@ -8,11 +8,14 @@ public class Request {
 
   private long id;
   private int node = -1;
-  private long nbInstructions;
+  
   protected String params;
   private List<Integer> rscList;
+  protected String type;
   protected int typeId;
-  long procTime;
+
+  private long nbInstructions;  // @deprecated
+  long procTime;  // @deprecated
 
   /** The timestamp when the client starts sending the {@code Request}. */
   private long clientStartTimestamp;
@@ -32,7 +35,6 @@ public class Request {
   /** The delay from the load balancing code (measured in nanoseconds). */
   private long loadBalancingDelayNS = 0;
 
-  protected String type;
   /** The cost associated with the {@code Request}. */
   private double cost = 0.0;
 
@@ -210,10 +212,6 @@ public class Request {
     return this.size;
   }
 
-  public String getParameters() {
-    return this.params;
-  }
-
   @Override
   public String toString() {
     return (id
@@ -232,6 +230,10 @@ public class Request {
             + params.replaceAll("&|=", ",")
             + "," + node
             + "," + cost);
+  }
+
+  public String getParameters() {
+    return this.params;
   }
 
   // I don't think this has what I perceived to be the intended behavior.  It
@@ -265,6 +267,7 @@ public class Request {
     this.node = nId;
   }
 
+  /** @deprecated */
   public long getProcTime() {
     return this.procTime;
   }
@@ -282,10 +285,12 @@ public class Request {
     return this.node;
   }
 
+  /** @deprecated */
   public long getNbInst() {
     return this.nbInstructions;
   }
 
+  /** @deprecated */
   public void setNbInst(long l) {
     this.nbInstructions = l;
   }
@@ -305,10 +310,6 @@ public class Request {
   public void setAppId(int i) {
     this.typeId = i;
   }
-
-
-
-
 
   /** @deprecated @return */
   public int getTypeId() {

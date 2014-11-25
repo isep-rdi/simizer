@@ -84,6 +84,7 @@ public class SendTask extends IOTask {
     }
 
     vm.send(destination, request, timestamp);
+    vm.commitSendTask(this);
 
     finish(timestamp);  // ends the Task and starts the next one
   }

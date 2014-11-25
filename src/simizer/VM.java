@@ -37,6 +37,14 @@ public class VM extends Node implements IEventProducer {
   /** The default amount of memory available on a {@code VM} (in bytes). */
   public static final long DEFAULT_MEMORY_SIZE = StorageElement.GIGABYTE;
 
+  /**
+   * Stores the active number of requests.
+   * <p>
+   * Requests are started when they are received by the system.  They are marked
+   * as finished when the response is sent back to the client.
+   */
+  private int activeRequestCount = 0;
+
   protected double hCost = 0.0;
   
   /** The amount of memory (RAM) in use by the {@code Application}s. */
@@ -65,10 +73,7 @@ public class VM extends Node implements IEventProducer {
   /** Whether or not the {@code VM} has been started. */
   private boolean started = false;
 
-
   // TODO: Need to count the active number of requests.
-  // TODO: getCapacity() returns the number of resources that can be stored on the storage element based on the current average size of resources.
-  // TODO: getNbCores() returns the number of processor cores
 
   public VM(Integer id, ProcessingUnit processor, StorageElement disk,
       Network network, long memory, double hCost) {
@@ -111,6 +116,14 @@ public class VM extends Node implements IEventProducer {
 
   public long getClock() {
     return this.clock;
+  }
+
+  public double getCost() {
+    return hCost;
+  }
+
+  public int getRequestCount() {
+    return activeRequestCount;
   }
 
   /**
@@ -164,6 +177,8 @@ public class VM extends Node implements IEventProducer {
    */
   @Override
   public void onRequestReceived(Node source, Request request) {
+    activeRequestCount++;
+    
     initTaskSession();
     Application app = idToApp.get(request.getAppId());
 
@@ -256,6 +271,23 @@ public class VM extends Node implements IEventProducer {
         disk.modify(res);
         break;
     }
+  }
+
+  public void commitSendTask(SendTask task) {
+    
+  }
+
+  public int getMaximumActiveRequestsCount() {
+    long size = 0;
+    long count = 0;
+
+    for (Resource r : disk.getResources()) {
+      size += r.size();
+      count++;
+    }
+
+    long average = size / count;
+    return (int) (this.memorySize / average);
   }
 
   /**

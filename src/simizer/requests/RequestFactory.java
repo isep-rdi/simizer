@@ -119,6 +119,10 @@ public class RequestFactory {
     this.templates = templates;
   }
 
+  public void addRequest(Request request) {
+    templates.put((int) request.getId(), request);
+  }
+
   /**
    * Builds a {@code Request} for the specified template.
    * <p>

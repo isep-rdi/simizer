@@ -1,49 +1,45 @@
-                                readme
-                                ======
+# Overview
 
-Author: Sylvain Lefebvre
-Date: 2014-04-14 09:58:25 CEST
+Simizer is a distributed application simulator.  This document will explain the general structure of the framework.
 
+## Properties
 
-1 Simizer is a distributed application simulator 
-=================================================
+  - Simizer is written in Java.
+  - It is designed to enable the comparison protocols performance.
 
-Simizer is written in JAVA.
-It is designed to enable the comparison protocols performance
+# Project Description
 
+## Why a new simulator?
 
-2 Project description 
-======================
-
-2.1 Why a new simulator ? 
---------------------------
 Trade offs in large distributed systems:
-  - Consistency VS Availability : Partition and fault tolerance
-  - Consistency VS Latency : System performance ->  QoS and SLAs
+  - Consistency VS Availability: Partition and fault tolerance
+  - Consistency VS Latency: System performance ->  QoS and SLAs
   - Cloud infrastructure issues:  Unpredictable latency variations (shared physical architectures)
+
 Existing simulators:
- - CloudSim [http://www.cloudbus.org/cloudsim/], 
- - SimGRID [http://simgrid.gforge.inria.fr/], 
+ - CloudSim [http://www.cloudbus.org/cloudsim/]
+ - SimGRID [http://simgrid.gforge.inria.fr/]
  - OptorSim [http://sourceforge.net/projects/optorsim/]
 
 $→$ mainly focus on physical infrastructure simulation and study.
 
-2.2 The simizer project 
-------------------------
+## The Simizer Project
+
 1. Started as a small load balancing simulator in 2012
 2. Derived from the need to simulate Amazon EC2 deployments
 3. Extended to support diverse protocols and geographic distribution of datacenters and clients
+
 $→$ Objective to integrate directly with load balancer
 
-2.3 Simizer Goals: 
--------------------
+## Project Goals
+
 - Provide means to simulate consistency policies at large scale
 - Provide a simple API to implement policies
 - Provide a simple JSON based system model specification
 - Simulation at virtual machine level rather than hardware level
 
-3 Using Simizer 
-================
+# Quickstart
+
 Replay a simulation:
 - to launch lbsim you need:
 + A load balancing policy

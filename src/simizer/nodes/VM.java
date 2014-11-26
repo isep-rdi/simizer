@@ -1,4 +1,4 @@
-package simizer;
+package simizer.nodes;
 
 import java.util.HashMap;
 import java.util.List;

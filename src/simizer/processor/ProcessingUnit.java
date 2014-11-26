@@ -3,7 +3,7 @@ package simizer.processor;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import simizer.VM;
+import simizer.nodes.VM;
 import simizer.processor.events.EpochEndedEvent;
 import simizer.processor.events.ProcTaskEndedEvent;
 import simizer.processor.tasks.*;

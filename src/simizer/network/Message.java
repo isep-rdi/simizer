@@ -1,6 +1,6 @@
 package simizer.network;
 
-import simizer.Node;
+import simizer.nodes.Node;
 import simizer.requests.Request;
 
 /**

@@ -1,6 +1,6 @@
 package simizer.processor.tasks;
 
-import simizer.VM;
+import simizer.nodes.VM;
 import simizer.event.Event;
 import simizer.processor.TaskProcessor;
 import simizer.storage.IOType;

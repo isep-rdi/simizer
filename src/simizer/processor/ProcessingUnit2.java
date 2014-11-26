@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
-import simizer.VM;
+import simizer.nodes.VM;
 import simizer.processor.tasks.DiskTask;
 import simizer.processor.tasks.IOTask;
 import simizer.processor.tasks.ProcTask;

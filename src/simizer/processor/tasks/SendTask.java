@@ -1,7 +1,7 @@
 package simizer.processor.tasks;
 
-import simizer.Node;
-import simizer.VM;
+import simizer.nodes.Node;
+import simizer.nodes.VM;
 import simizer.processor.TaskProcessor;
 import simizer.requests.Request;
 

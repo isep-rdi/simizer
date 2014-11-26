@@ -1,4 +1,4 @@
-package simizer;
+package simizer.nodes;
 
 import simizer.laws.Law;
 import simizer.network.Message;

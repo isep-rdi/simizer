@@ -1,4 +1,4 @@
-package simizer;
+package simizer.nodes;
 
 import simizer.network.Message;
 import simizer.network.Network;

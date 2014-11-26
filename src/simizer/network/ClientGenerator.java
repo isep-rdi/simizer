@@ -2,8 +2,8 @@ package simizer.network;
 
 import java.util.Iterator;
 import java.util.List;
-import simizer.ClientNode;
-import simizer.Node;
+import simizer.nodes.ClientNode;
+import simizer.nodes.Node;
 import simizer.Simulation;
 import simizer.event.ArrivalEvent;
 import simizer.laws.Law;

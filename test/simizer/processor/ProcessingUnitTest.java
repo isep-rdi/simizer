@@ -6,7 +6,7 @@ package simizer.processor;
 
 import org.junit.*;
 import static org.junit.Assert.*;
-import simizer.VM;
+import simizer.nodes.VM;
 import simizer.processor.tasks.IOTask;
 import simizer.processor.tasks.ProcTask;
 

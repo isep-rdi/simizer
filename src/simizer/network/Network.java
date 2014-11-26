@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import simizer.Node;
+import simizer.nodes.Node;
 import simizer.event.EventProducer;
 import simizer.event.MessageReceivedEvent;
 import simizer.laws.Law;

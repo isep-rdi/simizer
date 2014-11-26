@@ -175,6 +175,7 @@ public class ClientNode extends Node {
     int templateId = requestLaw.nextValue();
     Request request = requestFactory.getRequest(timestamp + nextTime, templateId);
     getNetwork().send(this, serviceAddress, request, timestamp + nextTime);
+    requestCount++;
   }
 
   /**

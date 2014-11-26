@@ -4,11 +4,11 @@ package simizer.laws;
  *
  * @author isep
  */
-public class UniLaw extends Law {
+public class ConstantLaw extends Law {
 
   private double param;
 
-  public UniLaw(int p) {
+  public ConstantLaw(int p) {
     super(p);
 
     this.param = (double) p;

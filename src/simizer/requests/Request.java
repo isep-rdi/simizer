@@ -6,7 +6,10 @@ import simizer.utils.Vector;
 
 public class Request {
 
-  private Long id;
+  /** The next ID that should be assigned to a {@code Requst}. */
+  private static Long nextID = 1L;
+
+  private final Long id;
   private int node = -1;
   
   protected String params;
@@ -44,10 +47,18 @@ public class Request {
   /** The size of the {@code Request}.  This value is mostly ignored. */
   private int size;
 
-  public Request(Long id, int typeId, long artime, String params, long procTime,
+  /**
+   * Initializes the {@code Request} with a unique ID.
+   */
+  private Request() {
+    this.id = nextID++;
+  }
+
+  public Request(int typeId, long artime, String params, long procTime,
       String type, long nbInst) {
 
-    this.id = id;
+    this();  // get an ID for the Request
+
     this.clientStartTimestamp = artime;
     this.type = type;
     this.typeId = typeId;
@@ -63,7 +74,8 @@ public class Request {
    * @param r
    */
   public Request(Request r) {
-    this.id = -1L;
+    this();  // get an ID for the Request
+    
     this.clientStartTimestamp = -1;
     this.node = 0;
     this.cost = r.cost;
@@ -328,7 +340,7 @@ public class Request {
    * @param cost
    * @param params
    */
-  public Request(long id, long artime, int node, float cost, String params) {
+  public Request(Long id, long artime, int node, float cost, String params) {
 
     this.id = id;
     this.clientStartTimestamp = artime;
@@ -338,15 +350,10 @@ public class Request {
 
   }
 
-  /** @deprecated */
-  @Deprecated
-  public void setId(Long id) {
-    this.id = id;
-  }
-
   /** @deprecated @param params */
   @Deprecated
   public Request(String params) {
+    this.id = null;
     this.params = params;
   }
 

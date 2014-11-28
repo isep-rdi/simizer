@@ -76,7 +76,7 @@ public class RequestFactory {
       String line;
       while ((line = reader.readLine()) != null) {
         String[] desc = line.split(";");
-        Request request = new Request(-1L, // request id
+        Request request = new Request(
             Integer.parseInt(desc[1]), // type/app id
             -1L, // arrival time
             desc[4], // parameters
@@ -138,7 +138,6 @@ public class RequestFactory {
   public Request getRequest(long arrivalTime, Integer templateId) {
     Request request = new Request(templates.get(templateId));
     request.setClientStartTimestamp(arrivalTime);
-    request.setId(counter++);
     return request;
   }
 

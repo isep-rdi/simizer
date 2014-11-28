@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import simizer.app.Application;
+import simizer.storage.Resource;
 
 /**
  * Builds {@code Request} objects from pre-defined templates.

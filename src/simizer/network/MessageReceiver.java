@@ -1,5 +1,7 @@
 package simizer.network;
 
+import simizer.Simulation;
+
 /**
  * Applied to objects that can be the destination of {@code Message}s.
  * <p>

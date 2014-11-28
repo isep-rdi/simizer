@@ -12,8 +12,8 @@ import simizer.storage.Resource;
 /**
  * Represents a running process on VM.
  * <p>
- * Implement the {@link #handle(simizer.Node, simizer.requests.Request)} method
- * for application-specific behavior.
+ * Implement the {@link #handle(Node, Request)} method for application-specific
+ * behavior.
  *
  * @author Sylvain Lefebvre
  */

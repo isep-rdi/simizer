@@ -111,7 +111,8 @@ public class IOController extends EventProducer {
      * Decreases the number of reference to the resource,
      * when the number reaches 0, the memory goes back to available,
      * and the resource is moved to the cached pool.
-     * @param resourceList
+     * @param rId
+     * @param timestamp
      * @throws Exception 
      */
     public void readDone(Integer rId, long timestamp) {
@@ -135,9 +136,8 @@ public class IOController extends EventProducer {
     }
     /**
      * Frees the resource form their respective locks
-     * @param r 
+     * @param resList
      */
-    
     public void releaseResource(List<Integer> resList) {
         for(Integer resId: resList) {
             memory.checkAndRelease(resId);

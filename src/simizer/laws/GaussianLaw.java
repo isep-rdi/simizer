@@ -10,7 +10,7 @@ import simizer.utils.StdRandom;
  * to half of the mean ({@code mean / 2}).  The standard deviation can be
  * customized by using the {@link #setParam(double)} method.
  * <p>
- * For an explanation of how out-of-range values are handled, see {@see
+ * For an explanation of how out-of-range values are handled, see {@link
  * #nextValue()}.
  */
 public class GaussianLaw extends Law {

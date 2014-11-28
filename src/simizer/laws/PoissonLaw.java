@@ -10,7 +10,7 @@ import simizer.utils.StdRandom;
  * by using the {@link #PoissonLaw(int, double)} constructor or the {@link
  * #setParam(double)} method.
  * <p>
- * For an explanation of how out-of-range values are handled, see {@see
+ * For an explanation of how out-of-range values are handled, see {@link
  * #nextValue()}.
  */
 public class PoissonLaw extends Law {

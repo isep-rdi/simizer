@@ -79,7 +79,7 @@ public class EventDispatcher implements Runnable {
    * This method will not return until
    * <ul><li>all events in the {@link Channel} have been processed (including
    *             those added after execution has begun)
-   *     <li>there are no events to process for at least {@value #WAIT_TIME} ms
+   *     <li>a pre-defined timeout expires without any events becoming available
    *     <li>the {@link #stop()} method is called</ul>
    */
   @Override

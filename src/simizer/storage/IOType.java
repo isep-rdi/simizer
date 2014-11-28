@@ -1,5 +1,7 @@
 package simizer.storage;
 
+import simizer.processor.tasks.DiskTask;
+
 /**
  * The possible types for storage-based IO operations.
  * <p>

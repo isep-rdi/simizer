@@ -2,6 +2,7 @@ package simizer.requests;
 
 import java.util.ArrayList;
 import java.util.List;
+import simizer.network.Network;
 import simizer.utils.Vector;
 
 public class Request {

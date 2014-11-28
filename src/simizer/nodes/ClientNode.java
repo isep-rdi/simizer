@@ -14,8 +14,7 @@ import simizer.requests.RequestFactory;
  * <p>
  * It is also possible to create {@code ClientNode} instances that send a
  * specified number of requests, rather than sending requests for some duration
- * of time.  See {@link #ClientNode(java.lang.Integer, simizer.network.Network,
- * long, int)}.
+ * of time.  See {@link #ClientNode(long, int)}.
  *
  * @author Sylvain Lefebvre
  */

@@ -6,7 +6,7 @@
  * and {@link simizer.nodes.ClientNode} provide specific implementations for
  * servers and clients in the simulation.
  * <p>
- * The {@link simzier.nodes.ClientNode} will send requests to the servers, and
+ * The {@link simizer.nodes.ClientNode} will send requests to the servers, and
  * then it will print out the responses that it receives.
  * <p>
  * The {@link simizer.nodes.VM} is a bit more generic, allowing customized

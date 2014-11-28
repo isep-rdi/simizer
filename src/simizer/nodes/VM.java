@@ -12,6 +12,7 @@ import simizer.processor.ProcessingUnit;
 import simizer.processor.tasks.*;
 import simizer.requests.Request;
 import simizer.storage.Cache;
+import simizer.storage.IOController;
 import simizer.storage.IOType;
 import simizer.storage.Resource;
 import simizer.storage.StorageElement;
@@ -21,7 +22,7 @@ import simizer.storage.StorageElement;
  * through the use of the Deploy method. Provides interface for the Applications
  * to read() write() and execute(). Handles TaskSession creations
  *
- * @TODO: add a started state check
+ * TODO: add a started state check
  * @see TaskSession
  *
  * @author slefebvr
@@ -160,8 +161,8 @@ public class VM extends Node implements IEventProducer {
    * <p>
    * It creates a new {@link TaskSession}, identifies the target application of
    * the {@link Request}, passes execution to the application's {@link
-   * Application#handle(simizer.Node, simizer.requests.Request)} method, and
-   * then starts execution of the {@link TaskSession}.
+   * Application#handle(Node, Request)} method, and then starts execution of the
+   * {@link TaskSession}.
    *
    * @param source the source {@link Node} of the {@link Request}
    * @param request the {@link Request} that was sent
@@ -185,13 +186,12 @@ public class VM extends Node implements IEventProducer {
   /**
    * Sends the specified {@code Request} to the specified {@code Node}.
    * <p>
-   * This method differs from {@link Network#send(simizer.Node,
-   * simizer.network.MessageReceiver, simizer.requests.Request, long)} in that
-   * it won't use the {@link Network} if the {@code destination} is this {@code
-   * VM}.  This saves time because it is not necessary to send the {@link
-   * Message} over the {@link Network}.
+   * This method differs from {@link Network#send(Node, MessageReceiver,
+   * Request, long)} in that it won't use the {@link Network} if the {@code
+   * destination} is this {@code VM}.  This saves time because it is not
+   * necessary to send the {@link Message} over the {@link Network}.
    *
-   * @see Network#send(simizer.Node, simizer.network.MessageReceiver, simizer.requests.Request, long)
+   * @see Network#send(Node, MessageReceiver, Request, long)
    * 
    * @param destination the destination of the {@link Request}
    * @param request the {@link Request} to send
@@ -415,10 +415,11 @@ public class VM extends Node implements IEventProducer {
    * request waits for an answer before continuing to the next task in the
    * session Request handling should return after calling this method.
    *
-   * @return
-   * @see Application.sendRequest
+   * @see Application#sendRequest(Node, Request)
    * @param dest
    * @param req
+   * @return whether or not the {@link Request} could be sent to the specified
+   *             {@link Node}
    */
   public boolean sendRequest(Node dest, Request req) {
     //req.setClientStartTimestamp(clock);
@@ -434,10 +435,13 @@ public class VM extends Node implements IEventProducer {
    * Sends back a response to a request. Completes the current tasks session.
    * Request handling should return after calling this method.
    *
-   * @return
    * @see Application
    * @param dest
    * @param req
+   * @return returns false if the {@link Request} cannot be sent to the
+   *             specified {@link Node} OR if the {@link Request} is not in its
+   *             "response" state.  (Meaning that the {@link Request} should
+   *             have already been sent by the client.)
    */
   public boolean sendResponse(Request req, Node dest) {
     if (getNetwork().getNode(dest.getId()) == null || req.getClientStartTimestamp() < 0) {

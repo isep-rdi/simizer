@@ -56,7 +56,6 @@ public class ProcessingUnit2 extends TaskProcessor {
     private long lastSchedule=0; // useful for computing task ends. 
     /**
      *
-     * @param nbProc
      * @param coreMips
      * @param vm
      */

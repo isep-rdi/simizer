@@ -13,7 +13,7 @@ package simizer.storage;
 public class Resource {
 
   /** The default size of {@code Resource}s. */
-  private static final int DEFAULT_SIZE = 1024;
+  public static final int DEFAULT_SIZE = 1024;
 
   /** The ID of the {@code Resource}. */
   private final Integer id;
@@ -78,7 +78,7 @@ public class Resource {
   /**
    * Returns the size of the {@code Resource}.
    *
-   * @return
+   * @return the size of the {@code Resource}
    */
   public long size() {
     return size;

@@ -1,5 +1,7 @@
 package simizer.event;
 
+import simizer.Simulation;
+
 /**
  * Allows events to be queued for later execution.
  * <p>

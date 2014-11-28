@@ -33,7 +33,6 @@ public class Memory extends StorageElement {
    * there is not enough space.
    *
    * @param r
-   * @return time to load the resource
    * @throws NotEnoughSpaceException
    */
   public void loadResource(Resource r) throws NotEnoughSpaceException {

@@ -10,7 +10,7 @@ import java.util.concurrent.PriorityBlockingQueue;
  * priority queue so that events are delivered in order of their timestamps.
  * <p>
  * For a more detailed explanation on the events infrastructure in Simizer, use
- * {@see EventDispatcher}.
+ * {@link EventDispatcher}.
  */
 public class Channel extends PriorityBlockingQueue<Event> {
 
@@ -19,7 +19,7 @@ public class Channel extends PriorityBlockingQueue<Event> {
    * <p>
    * Passes the event to the system for delivery at the timestamp specified in
    * the event.  Note that a {@code Channel} is only responsible for storing
-   * events.  To deliver the events to the system, see {@see EventDispatcher}.
+   * events.  To deliver the events to the system, see {@link EventDispatcher}.
    *
    * @param event the {@code Event} to be delivered
    */

@@ -70,7 +70,7 @@ public abstract class Task {
    * @param vm the {@code VM} on which to execute this {@code Task}
    * @param timestamp the time when the execution starts (to schedule events)
    *
-   * @deprecated Use {@link #run(long)} instead.
+   * @deprecated Use {@link #run(TaskProcessor, long)} instead.
    */
   public void startTask(VM vm, long timestamp) {}
 

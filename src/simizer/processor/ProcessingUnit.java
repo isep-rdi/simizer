@@ -91,7 +91,7 @@ public class ProcessingUnit extends TaskProcessor {
    * starts execution of new tasks, CFS style.
    *
    * @param timestamp
-   * @param r
+   * @param data
    */
   public void onEpochEnded(long timestamp, Integer data) {
     scheduleEpoch(timestamp);

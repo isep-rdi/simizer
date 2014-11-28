@@ -3,8 +3,10 @@ package simizer.nodes;
 import simizer.laws.Law;
 import simizer.network.Message;
 import simizer.network.MessageReceiver;
+import simizer.request.printers.PrettyRequestPrinter;
 import simizer.requests.Request;
 import simizer.requests.RequestFactory;
+import simizer.requests.RequestPrinter;
 
 /**
  * Simulates a client machine.
@@ -48,6 +50,22 @@ public class ClientNode extends Node {
     ClientNode.durationLaw = durationLaw;
     ClientNode.requestLaw = requestLaw;
     ClientNode.thinkTimeLaw = thinkTimeLaw;
+  }
+
+  /** The printer used to format the output of the simulation. */
+  private static RequestPrinter printer = new PrettyRequestPrinter(System.out);
+
+  /**
+   * Sets the {@code RequestPrinter} used to output the results.
+   * <p>
+   * The simulation allows fully-customizable output through the various {@link
+   * RequestPrinter} classes.  A few are provided by default in the simulation,
+   * but custom ones can easily be created for each usage case.
+   *
+   * @param requestPrinter the {@link RequestPrinter} to use
+   */
+  public static void setRequestPrinter(RequestPrinter requestPrinter) {
+    printer = requestPrinter;
   }
 
   /** The timestamp when the client starts its execution. */
@@ -190,9 +208,8 @@ public class ClientNode extends Node {
       System.out.println("PROBLEM");
     }
 
-    System.out.println(r.toString()
-        + ";" + (timestamp - r.getClientStartTimestamp())
-        + ";" + getId());
+    r.setClientEndTimestamp(timestamp);
+    printer.print(this, r);
 
     if (requestsToSend != null) {
       // if the number of requests to send is set, use that method

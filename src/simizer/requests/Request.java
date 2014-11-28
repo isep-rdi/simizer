@@ -31,6 +31,9 @@ public class Request {
 
   /** The timestamp when the client starts sending the {@code Request}. */
   private long clientStartTimestamp;
+  
+  /** The timestamp when the client receives the response. */
+  private long clientEndTimestamp;
 
   /**
    * The timestamp when the server finishes processing the {@code Request}.
@@ -145,6 +148,30 @@ public class Request {
    */
   public void setClientStartTimestamp(long clientStartTimestamp) {
     this.clientStartTimestamp = clientStartTimestamp;
+  }
+
+  /**
+  * Returns the timestamp when the client received the response.
+  * <p>
+  * When a client receives a response from the server, this value is set to the
+  * current timestamp.
+  *
+  * @return the timestamp when the client received the response
+  */
+  public long getClientEndTimestamp() {
+    return clientEndTimestamp;
+  }
+
+  /**
+   * Sets the timestamp when the client receives the response.
+   * <p>
+   * This value should only be set once per {@code Request}.
+   *
+   * @param clientEndTimestamp the timestamp when the client received the
+   *            response
+   */
+  public void setClientEndTimestamp(long clientEndTimestamp) {
+    this.clientEndTimestamp = clientEndTimestamp;
   }
 
   /**

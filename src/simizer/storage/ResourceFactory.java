@@ -30,9 +30,6 @@ public class ResourceFactory {
   /** The size of each created {@code Resource}. */
   private final int resourceSize;
 
-  /** Unclear. */
-  private int resourceCounter = 0;
-
   /**
    * Stores the {@code Resource} objects that have been created.
    * <p>

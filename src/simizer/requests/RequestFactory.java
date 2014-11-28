@@ -76,7 +76,7 @@ public class RequestFactory {
       String line;
       while ((line = reader.readLine()) != null) {
         String[] desc = line.split(";");
-        Request request = new Request(-1, // request id
+        Request request = new Request(-1L, // request id
             Integer.parseInt(desc[1]), // type/app id
             -1L, // arrival time
             desc[4], // parameters
@@ -106,7 +106,7 @@ public class RequestFactory {
   private final Map<Integer, Request> templates;
 
   /** An internal counter used to assign unique {@code Request ID}s. */
-  private int counter;
+  private Long counter;
 
   /**
    * Initializes a new instance of the class with the specified templates.
@@ -115,12 +115,12 @@ public class RequestFactory {
    *            are the ID of the template
    */
   public RequestFactory(Map<Integer, Request> templates) {
-    this.counter = 0;
+    this.counter = 0L;
     this.templates = templates;
   }
 
-  public void addRequest(Request request) {
-    templates.put((int) request.getId(), request);
+  public void addRequest(Integer templateId, Request request) {
+    templates.put(templateId, request);
   }
 
   /**

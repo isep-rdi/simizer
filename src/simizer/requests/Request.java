@@ -6,7 +6,7 @@ import simizer.utils.Vector;
 
 public class Request {
 
-  private long id;
+  private Long id;
   private int node = -1;
   
   protected String params;
@@ -44,7 +44,7 @@ public class Request {
   /** The size of the {@code Request}.  This value is mostly ignored. */
   private int size;
 
-  public Request(long id, int typeId, long artime, String params, long procTime,
+  public Request(Long id, int typeId, long artime, String params, long procTime,
       String type, long nbInst) {
 
     this.id = id;
@@ -63,7 +63,7 @@ public class Request {
    * @param r
    */
   public Request(Request r) {
-    this.id = -1;
+    this.id = -1L;
     this.clientStartTimestamp = -1;
     this.node = 0;
     this.cost = r.cost;
@@ -78,7 +78,7 @@ public class Request {
     this.nbInstructions = r.nbInstructions;
   }
 
-  public long getId() {
+  public Long getId() {
     return this.id;
   }
 
@@ -406,7 +406,7 @@ public class Request {
 
   /** @deprecated */
   @Deprecated
-  public void setId(long id) {
+  public void setId(Long id) {
     this.id = id;
   }
 

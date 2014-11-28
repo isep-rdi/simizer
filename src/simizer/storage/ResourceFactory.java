@@ -12,7 +12,7 @@ import java.util.Map;
  * Using the {@link #ResourceFactory(int, int, int)} constructor, the factory
  * instance can be pre-populated with {@link Resource} objects.  After creation,
  * additional {@code Resource}s are added whenever they are accessed using the
- * {@link #getResource(int)} method.
+ * {@link #getResource(java.lang.Integer)} method.
  * <p>
  * When accessing {@link Resource} objects, this class returns copies rather
  * than the resources themselves.  This is in place to allow the same {@link
@@ -107,7 +107,7 @@ public class ResourceFactory {
    * @param id the ID of the resource to return
    * @return the resource with the specified ID
    */
-  public Resource getResource(int id) {
+  public Resource getResource(Integer id) {
     if (!resources.containsKey(id)) {
       resources.put(id, new Resource(id, resourceSize));
     }
@@ -120,7 +120,7 @@ public class ResourceFactory {
    * This is all of the resources that have already been created by the factory.
    * This includes the resources created using the initializer, and it also
    * includes any other resources that have been accessed with the {@link
-   * #getResource(int)} method.
+   * #getResource(java.lang.Integer)} method.
    * 
    * @return a list of {@code Resource} IDs stored in this factory
    */
@@ -142,10 +142,10 @@ public class ResourceFactory {
    * <p>
    * However, note that resources are recreated when they are specifically
    * requested by their ID.  Therefore, calling this method has no effect on the
-   * behavior of the {@link #getResource(int)} method.  Also note that the
-   * return value of this method or the {@link #getStartList()} method could be
-   * affected by calls that have been made to the {@link #getResource(int)}
-   * method.
+   * behavior of the {@link #getResource(java.lang.Integer)} method.  Also note
+   * that the return value of this method or the {@link #getStartList()} method
+   * could be affected by calls that have been made to the {@link
+   * #getResource(java.lang.Integer)} method.
    * 
    * @param numberOfResources the number of resources to return
    * @return a list containing the IDs for resources from this factory

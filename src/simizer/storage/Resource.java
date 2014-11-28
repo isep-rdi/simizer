@@ -16,7 +16,7 @@ public class Resource {
   private static final int DEFAULT_SIZE = 1024;
 
   /** The ID of the {@code Resource}. */
-  private final int id;
+  private final Integer id;
 
   /** The current size of the {@code Resource}. */
   private long size;
@@ -37,7 +37,7 @@ public class Resource {
    *
    * @param resourceId the ID to use for the {@code Resource}
    */
-  public Resource(int resourceId) {
+  public Resource(Integer resourceId) {
     this(resourceId, DEFAULT_SIZE);
   }
 
@@ -47,7 +47,7 @@ public class Resource {
    * @param resourceId the ID to use for the {@code Resource}
    * @param size the size of the {@code Resource}
    */
-  public Resource(int resourceId, int size) {
+  public Resource(Integer resourceId, int size) {
     this.id = resourceId;
     this.size = size;
   }
@@ -71,7 +71,7 @@ public class Resource {
    *
    * @return the ID of the {@code Resource}
    */
-  public int getId() {
+  public Integer getId() {
     return this.id;
   }
 

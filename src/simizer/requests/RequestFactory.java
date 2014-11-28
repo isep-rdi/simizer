@@ -16,13 +16,26 @@ import simizer.storage.Resource;
  * Builds {@code Request} objects from pre-defined templates.
  * <p>
  * Typically, the templates will be loaded from a CSV file.  See {@link
- * #loadRequests(java.lang.String)} for an explanation of the format of this
+ * #loadTemplates(java.lang.String)} for an explanation of the format of this
  * file.
  * <p>
  * Once loaded, {@link Request} objects can be created from templates by calling
  * the {@link #getRequest(long, java.lang.Integer)} method.
  */
 public class RequestFactory {
+
+  /** The templates used by this {@code RequestFactory}. */
+  private final Map<Integer, Request> templates;
+
+  /**
+   * Initializes a new instance of the class.
+   * <p>
+   * To load templates from a file, use {@link
+   * #loadTemplates(java.lang.String)}.
+   */
+  public RequestFactory() {
+    this.templates = new HashMap<>();
+  }
 
   /**
    * Parses the specified file, loading the templates defined in the file.
@@ -63,15 +76,11 @@ public class RequestFactory {
    * </dl></blockquote>
    *
    * @param path the path of the file to load
-   * @return a map containing {@link Request} objects accessible by their {@code
-   *             Template ID}
    * @throws IOException if a problem occurs opening or reading the file
    */
-  public static Map<Integer, Request> loadRequests(String path)
-        throws IOException {
-
+  public void loadTemplates(String path) throws IOException {
     BufferedReader reader = null;
-    Map<Integer, Request> templateMap = new HashMap<>();
+    
     try {
       reader = new BufferedReader(new FileReader(new File(path)));
 
@@ -86,38 +95,31 @@ public class RequestFactory {
             desc[2], // type
             Long.parseLong(desc[5]) * 1000000); // number of instructions
         request.setAppId(Integer.parseInt(desc[1]));
-        templateMap.put(Integer.parseInt(desc[0]), request);
+        addTemplate(Integer.parseInt(desc[0]), request);
       }
 
     } catch (FileNotFoundException ex) {
       Logger.getLogger(RequestFactory.class.getName()).log(
           Level.SEVERE, null, ex);
-      templateMap = null;
     } finally {
       try {
-        reader.close();
+        if (reader != null) {
+          reader.close();
+        }
       } catch (IOException ex) {
         Logger.getLogger(RequestFactory.class.getName()).log(
             Level.SEVERE, null, ex);
       }
     }
-    return templateMap;
   }
-
-  /** The templates used by this {@code RequestFactory}. */
-  private final Map<Integer, Request> templates;
 
   /**
-   * Initializes a new instance of the class with the specified templates.
+   * Adds a template for the specified {@code Request} to this factory.
    *
-   * @param templates a {@link Map} containing request templates, where the keys
-   *            are the ID of the template
+   * @param templateId the ID for the template that is added
+   * @param request the {@link Request} to use as the template
    */
-  public RequestFactory(Map<Integer, Request> templates) {
-    this.templates = templates;
-  }
-
-  public void addRequest(Integer templateId, Request request) {
+  public void addTemplate(Integer templateId, Request request) {
     templates.put(templateId, request);
   }
 

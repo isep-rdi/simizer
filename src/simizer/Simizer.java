@@ -114,9 +114,9 @@ public class Simizer {
   static public void generate(String lawConf, String rDescFile, int nbUsers, int maxReq, int interval) {
 
     Map<String, Law> lawMap = loadLaws(lawConf);
-    RequestFactory rf = null;
+    RequestFactory rf = new RequestFactory();
     try {
-      rf = new RequestFactory(RequestFactory.loadRequests(rDescFile));
+      rf.loadTemplates(rDescFile);
     } catch (IOException ex) {
       Logger.getLogger(Simizer.class.getName()).log(Level.SEVERE, null, ex);
       System.exit(0);

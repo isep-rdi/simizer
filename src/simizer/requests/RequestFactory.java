@@ -88,13 +88,10 @@ public class RequestFactory {
       while ((line = reader.readLine()) != null) {
         String[] desc = line.split(";");
         Request request = new Request(
-            Integer.parseInt(desc[1]), // type/app id
-            -1L, // arrival time
-            desc[4], // parameters
-            Long.parseLong(desc[3]), // processing time
-            desc[2], // type
-            Long.parseLong(desc[5]) * 1000000); // number of instructions
-        request.setAppId(Integer.parseInt(desc[1]));
+            Integer.parseInt(desc[1]),  // application ID
+            desc[2],  // action
+            desc[4],  // parameters
+            true);  // this is a template
         addTemplate(Integer.parseInt(desc[0]), request);
       }
 

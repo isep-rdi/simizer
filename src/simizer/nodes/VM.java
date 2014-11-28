@@ -179,7 +179,7 @@ public class VM extends Node implements IEventProducer {
     activeRequestCount++;
     
     initTaskSession();
-    Application app = idToApp.get(request.getAppId());
+    Application app = idToApp.get(request.getApplicationId());
 
     if (app == null) {
       request.reportErrors(1);

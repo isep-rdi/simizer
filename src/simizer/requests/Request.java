@@ -13,10 +13,18 @@ public class Request {
   private final Long id;
   private int node = -1;
   
-  protected String params;
   private List<Integer> rscList;
-  protected String type;
-  protected int typeId;
+
+  /**
+   * The ID of the {@code Application} that should handle the {@code Request}.
+   */
+  protected Integer applicationId;
+
+  /** The action that the {@code Application} should perform. */
+  protected String action;
+
+  /** The parameter string to pass to the handler. */
+  protected String params;
 
   private long nbInstructions;  // @deprecated
   long procTime;  // @deprecated
@@ -49,24 +57,40 @@ public class Request {
   private int size;
 
   /**
-   * Initializes the {@code Request} with a unique ID.
+   * Performs internal initialization of the {@code Request}.
+   * <p>
+   * This involves setting the ID of the {@code Request} if one is needed.
+   * Since templates are not sent through the system, they don't need an ID.
    */
-  private Request() {
-    this.id = nextID++;
+  private Request(boolean isTemplate) {
+    if (isTemplate) {
+      this.id = null;
+    } else {
+      this.id = nextID++;
+    }
   }
 
-  public Request(int typeId, long artime, String params, long procTime,
-      String type, long nbInst) {
+  public Request(Integer applicationId, String action, String parameters,
+      boolean isTemplate) {
 
-    this();  // get an ID for the Request
+    this(isTemplate);
 
-    this.clientStartTimestamp = artime;
-    this.type = type;
-    this.typeId = typeId;
-    this.params = params;
-    this.procTime = procTime;
-    this.rscList = parseResources(params);
-    this.nbInstructions = nbInst;
+    // set the configurable properties
+    this.applicationId = applicationId;
+    this.action = action;
+    this.params = parameters;
+
+    // set default values
+    this.clientStartTimestamp = -1L;
+    this.procTime = 0;  // unused
+    this.nbInstructions = 0;  // unused
+
+    // load necessary information into supplementary data structures
+    this.rscList = parseResources(parameters);
+  }
+
+  public Request(Integer applicationId, String action, String parameters) {
+    this(applicationId, action, parameters, false);
   }
 
   /**
@@ -75,7 +99,7 @@ public class Request {
    * @param r
    */
   public Request(Request r) {
-    this();  // get an ID for the Request
+    this(false);  // get an ID for the Request
     
     this.clientStartTimestamp = -1;
     this.node = 0;
@@ -84,8 +108,8 @@ public class Request {
     this.procTime = r.procTime;
     this.rscList = r.rscList;
     this.serverFinishTimestamp = 0;
-    this.type = r.type;
-    this.typeId = r.typeId;
+    this.action = r.action;
+    this.applicationId = r.applicationId;
     this.errorCount = 0;
 
     this.nbInstructions = r.nbInstructions;
@@ -245,6 +269,14 @@ public class Request {
             + "," + cost);
   }
 
+  public Integer getApplicationId() {
+    return this.applicationId;
+  }
+
+  public String getAction() {
+    return this.action;
+  }
+
   public String getParameters() {
     return this.params;
   }
@@ -308,25 +340,14 @@ public class Request {
     this.nbInstructions = l;
   }
 
-  public String getRequestType() {
-    return this.type;
-  }
-
-  public int getAppId() {
-    return this.typeId;
-  }
-
-  public String getType() {
-    return this.type;
-  }
-
+  /**
+   *
+   * @param i
+   * @deprecated The ID should be set when the {@code Request} is created.
+   */
+  @Deprecated
   public void setAppId(int i) {
-    this.typeId = i;
-  }
-
-  /** @deprecated @return */
-  public int getTypeId() {
-    return this.typeId;
+    this.applicationId = i;
   }
 
   // new type of request for request factory

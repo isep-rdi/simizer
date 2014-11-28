@@ -107,9 +107,6 @@ public class RequestFactory {
   /** The templates used by this {@code RequestFactory}. */
   private final Map<Integer, Request> templates;
 
-  /** An internal counter used to assign unique {@code Request ID}s. */
-  private Long counter;
-
   /**
    * Initializes a new instance of the class with the specified templates.
    *
@@ -117,7 +114,6 @@ public class RequestFactory {
    *            are the ID of the template
    */
   public RequestFactory(Map<Integer, Request> templates) {
-    this.counter = 0L;
     this.templates = templates;
   }
 

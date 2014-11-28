@@ -26,7 +26,6 @@ public class ClientGenerator {
   private final int interval;
   private final Network network;
   
-  private int lastId = 0;
   private int maxUsers = 0;
 
   public ClientGenerator(Simulation simulation, Network network, Law arrivalLaw,
@@ -76,7 +75,7 @@ public class ClientGenerator {
     nodesToCreate = Math.min(maxUsers - nodeList.size(), nodesToCreate);
 
     while (nodesToCreate > 0) {
-      createNode(lastId++, timestamp);
+      createNode(timestamp);
       nodesToCreate--;
     }
 
@@ -117,11 +116,10 @@ public class ClientGenerator {
   /**
    * Creates a new {@code ClientNode} for the simulation.
    * 
-   * @param id the ID of the node to create
    * @param timestamp the timestamp when the client should start its behavior
    */
-  private void createNode(int id, long timestamp) {
-    ClientNode client = new ClientNode(id, network, timestamp);
+  private void createNode(long timestamp) {
+    ClientNode client = new ClientNode(timestamp);
     client.setServiceAddress(frontend);
     simulation.toNetworkAddNode(network, client);
     client.start();

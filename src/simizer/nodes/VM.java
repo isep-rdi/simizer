@@ -75,10 +75,11 @@ public class VM extends Node implements IEventProducer {
 
   // TODO: Need to count the active number of requests.
 
-  public VM(Integer id, ProcessingUnit processor, StorageElement disk,
-      Network network, long memory, double hCost) {
+  public VM(ProcessingUnit processor, StorageElement disk, long memory,
+      double hCost) {
 
-    super(id, network);
+    super();
+
     this.processor = (processor != null)
             ? processor
             : new ProcessingUnit(1, 1000, null);
@@ -93,21 +94,11 @@ public class VM extends Node implements IEventProducer {
     this.processor.setNodeInstance(this);
   }
 
-  /** @deprecated */
-  public VM(int id, Network network, ProcessingUnit processor, long memSize,
-        StorageElement disk, double hCost) {
-
-    this(id, processor, disk, network, memSize, hCost);
-  }
-
   /**
    * Default constructor, with default processor and default cost.
-   *
-   * @param id
-   * @param network
    */
-  public VM(int id, Network network) {
-    this(id, network, null, DEFAULT_MEMORY_SIZE, null, DEFAULT_COST);
+  public VM() {
+    this(null, null, DEFAULT_MEMORY_SIZE, DEFAULT_COST);
   }
 
   public ProcessingUnit getProcessingUnit() {

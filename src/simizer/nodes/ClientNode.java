@@ -3,7 +3,6 @@ package simizer.nodes;
 import simizer.laws.Law;
 import simizer.network.Message;
 import simizer.network.MessageReceiver;
-import simizer.network.Network;
 import simizer.requests.Request;
 import simizer.requests.RequestFactory;
 
@@ -82,26 +81,24 @@ public class ClientNode extends Node {
    * See {@link #configureLaws(simizer.laws.Law, simizer.laws.Law,
    * simizer.laws.Law)} for a description of the laws.
    *
-   * @param id the ID of the client
-   * @param network the {@link Network} that the client should use
    * @param startTime the time when the client should begin its operations
    */
-  public ClientNode(Integer id, Network network, long startTime) {
-    super(id, network);
+  public ClientNode(long startTime) {
+    super();
+    
     this.startTime = startTime;
   }
 
   /**
    * Creates a client that sends a specific number of requests.
    *
-   * @param id the ID of the client
-   * @param network the {@link Network} that the client should use
    * @param startTime the time when the client should begin its operations
    * @param requests the number of requests that the client should send before
    *            ending its execution
    */
-  public ClientNode(Integer id, Network network, long startTime, int requests) {
-    this(id, network, startTime);
+  public ClientNode(long startTime, int requests) {
+    this(startTime);
+
     this.requestsToSend = requests;
   }
 

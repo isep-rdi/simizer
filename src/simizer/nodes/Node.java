@@ -15,24 +15,22 @@ import simizer.network.MessageReceiver;
  */
 public abstract class Node implements MessageReceiver {
 
+  /** The counter for assigning Node IDs. */
+  private static Integer nextID = 1;  // start from 1
+  
   /** The Node ID for this {@code Node}. */
   private final Integer id;
 
   /** The {@code Network} associated with this {@code Node}. */
-  private Network network;
+  private Network network = null;
 
   protected long clock;
 
   /**
    * Initializes a new instance with the specified ID and {@code Network}.
-   * 
-   * @param id the ID of this {@code Node}.  Cannot be changed.
-   * @param network the {@link Network} that should be associated with this
-   *            {@code Node}
    */
-  public Node(int id, Network network) {
-    this.id = id;
-    this.network = network;
+  public Node() {
+    this.id = nextID++;
   }
 
   /**

@@ -1,6 +1,6 @@
 package simizer.laws;
 
-import org.junit.*;
+import org.junit.Before;
 
 /**
  * Tests the behavior of the PoissonLaw class.

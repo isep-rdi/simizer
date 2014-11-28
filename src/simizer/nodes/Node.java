@@ -2,9 +2,9 @@ package simizer.nodes;
 
 import simizer.Simulation;
 import simizer.network.Message;
+import simizer.network.MessageReceiver;
 import simizer.network.Network;
 import simizer.requests.Request;
-import simizer.network.MessageReceiver;
 
 /**
  * Represents a system able to communicate through a {@code Network}.

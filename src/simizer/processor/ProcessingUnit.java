@@ -6,7 +6,10 @@ import java.util.Map;
 import simizer.nodes.VM;
 import simizer.processor.events.EpochEndedEvent;
 import simizer.processor.events.ProcTaskEndedEvent;
-import simizer.processor.tasks.*;
+import simizer.processor.tasks.ProcTask;
+import simizer.processor.tasks.SendTask;
+import simizer.processor.tasks.Task;
+import simizer.processor.tasks.TaskStatus;
 
 /**
  * Processor Default class for simizer. Provides performance model for

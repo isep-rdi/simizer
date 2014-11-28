@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.PriorityQueue;
 import simizer.nodes.VM;
 import simizer.processor.tasks.DiskTask;
-import simizer.processor.tasks.IOTask;
 import simizer.processor.tasks.ProcTask;
 import simizer.processor.tasks.Task;
 import simizer.processor.tasks.TaskSession;

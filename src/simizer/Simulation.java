@@ -1,6 +1,5 @@
 package simizer;
 
-import simizer.nodes.Node;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -9,6 +8,7 @@ import simizer.event.Channel;
 import simizer.event.EventDispatcher;
 import simizer.event.IEventProducer;
 import simizer.network.Network;
+import simizer.nodes.Node;
 
 /**
  * Utility class for setting up and starting a simulation.

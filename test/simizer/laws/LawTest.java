@@ -1,7 +1,9 @@
 package simizer.laws;
 
 import java.lang.reflect.Field;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * Basic tests that should be run on all Law subclasses.

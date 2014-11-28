@@ -4,8 +4,13 @@
  */
 package simizer.processor;
 
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import simizer.nodes.VM;
 import simizer.processor.tasks.IOTask;
 import simizer.processor.tasks.ProcTask;

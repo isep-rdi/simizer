@@ -1,7 +1,9 @@
 package simizer.requests;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import simizer.network.Network;
 import simizer.utils.Vector;
 
@@ -47,11 +49,8 @@ public class Request {
   /** The delay that comes as a result of {@code Network} delays. */
   private long networkDelay = 0;
 
-  /** The delay from the load balancing code (measured in nanoseconds). */
-  private long loadBalancingDelayNS = 0;
-
-  /** The cost associated with the {@code Request}. */
-  private double cost = 0.0;
+  /** Stores fields used by custom applications. */
+  private final Map<String, Object> customFields = new HashMap<>();
 
   /** The number of errors that have occurred for this {@code Request}. */
   private int errorCount = 0;
@@ -106,7 +105,7 @@ public class Request {
     
     this.clientStartTimestamp = -1;
     this.node = 0;
-    this.cost = r.cost;
+    this.set("cost", r.get("cost"));
     this.params = r.params;
     this.procTime = r.procTime;
     this.rscList = r.rscList;
@@ -120,6 +119,29 @@ public class Request {
 
   public Long getId() {
     return this.id;
+  }
+
+  /**
+   * Sets the value for a custom field.
+   * <p>
+   * This will create the custom field if it has not yet been created, and it
+   * will also replace any existing value.
+   *
+   * @param name the name of the custom field
+   * @param value the value for the custom field
+   */
+  public final void set(String name, Object value) {
+    customFields.put(name, value);
+  }
+
+  /**
+   * Returns the value for the specified custom field.
+   *
+   * @param name the name for the custom field
+   * @return the value for this custom field, or null if it is not set
+   */
+  public final Object get(String name) {
+    return customFields.get(name);
   }
 
   /**
@@ -214,37 +236,6 @@ public class Request {
   }
 
   /**
-   * Sets the load balancing delay.
-   * <p>
-   * In order to accurately measure the time taken by the various load balancing
-   * algorithms, this value is measured as accurately as possible.  It is
-   * measured in nanoseconds to provide enough granularity.
-   *
-   * @param nanoseconds the amount of the delay, measured in nanoseconds
-   */
-  public void setLoadBalancingDelayNS(long nanoseconds) {
-    this.loadBalancingDelayNS = nanoseconds;
-  }
-
-  /**
-   * Sets the cost associated with this {@code Request}.
-   *
-   * @param cost the cost to associated with this {@code Request}
-   */
-  public void setCost(double cost) {
-    this.cost = cost;
-  }
-
-  /**
-   * Returns the cost associated with this {@code Request}.
-   *
-   * @return the cost associated with this {@code Request}
-   */
-  public double getCost() {
-    return this.cost;
-  }
-
-  /**
    * Returns the number of errors that have occurred.
    *
    * @return the number of errors that have occurred
@@ -284,8 +275,8 @@ public class Request {
             + ";" + serverFinishTimestamp
             + ";" + networkDelay
             + ";" + node
-            + ";" + loadBalancingDelayNS
-            + ";" + cost
+            + ";" + get("loadBalancingDelay")  // for backwards compatibility
+            + ";" + get("cost")  // for backwards compatibility
             + ";" + errorCount + "r");
   }
 
@@ -293,7 +284,7 @@ public class Request {
     return (id + ","
             + params.replaceAll("&|=", ",")
             + "," + node
-            + "," + cost);
+            + "," + get("cost"));
   }
 
   public Integer getApplicationId() {
@@ -389,12 +380,12 @@ public class Request {
    * @param cost
    * @param params
    */
-  public Request(Long id, long artime, int node, float cost, String params) {
+  public Request(Long id, long artime, int node, double cost, String params) {
 
     this.id = id;
     this.clientStartTimestamp = artime;
     this.node = node;
-    this.cost = cost;
+    set("cost", cost);
     this.params = params;
 
   }

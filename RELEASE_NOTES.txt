@@ -1,3 +1,47 @@
+v0.9.1
+======
+_30 Nov 2014_
+
+This update (in addition to the next few) makes an attempt to simplify
+components of the framework to make it easier to learn.  In writing the first
+tutorial, certain actions were unnecessarily complicated or confusing.  To solve
+this problem, certain parts of the framework have been simplified.
+
+There are still a few components that are confusing, and there will likewise be
+certain parts of future tutorials that are confusing.  Therefore, the next few
+releases will have a focus on simplification and understanding.
+
+Specific changes made in this release include:
+
+ - Automatically assigning Node and Request IDs within the framework.  This
+   means that, for simple Applications, it is not necessary to draw unnecessary
+   attention to assigning IDs.  In addition, when the values are needed, they
+   can be retrieved from a `Node`.  This results in code that is easier to read
+   and less error-prone.
+
+ - Using objects for IDs (e.g., `Integer` instead of `int`).  Because IDs are
+   commonly used in collections, and because we don't want any of the IDs to be
+   used as indices, we store them as objects instead of primitives.
+
+ - Various improvements to the `Request` class:
+
+   - Simplification of the constructor so that unneeded values aren't specified.
+
+   - Improved formatting when printing responses (which include the details of
+     the `Request`) for `ClientNode`.
+
+   - Improvements to the `RequestFactory` class to simplify its usage.
+
+   - Adding custom fields to the `Request` object that can be used by
+     `Application` subclasses.
+
+There were also a few minor code changes, including:
+
+ - Fixing Javadoc `@link` errors.
+
+ - Fixing the imports to sort them and remove `*` imports.
+
+
 v0.9.0.1
 ========
 _26 Nov 2014_

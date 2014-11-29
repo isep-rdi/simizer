@@ -1,27 +1,29 @@
-Version 0.9.0.1
----------------
+v0.9.0.1
+========
+_26 Nov 2014_
 
-  When writing the first tutorial that linked against the v0.9 version of the
-  framework, I found a few bugs or minor things that needed to be changed.
-  Those changes are:
+When writing the first tutorial that linked against the v0.9 version of the
+framework, I found a few bugs or minor things that needed to be changed.  Those
+changes are:
 
-    - fixing an infinite loop in clients that send a specific number of requests
-      before finishing
+ - fixing an infinite loop in clients that send a specific number of requests
+   before finishing
 
-    - renaming one of the laws (UniLaw -> ConstantLaw) to make its purpose more
-      obvious, as well as to reduce confusion with the UniformLaw
+ - renaming one of the laws (UniLaw -> ConstantLaw) to make its purpose more
+   obvious, as well as to reduce confusion with the UniformLaw
 
-    - allowing RequestFactory instances to be created without needing to store
-      the templates in a file.  This simplified the first tutorial.
+ - allowing RequestFactory instances to be created without needing to store the
+   templates in a file.  This simplified the first tutorial.
 
-Version 0.9
------------
 
-  This is the first marked release.  I put it in place so that it is easier to
-  quickly find versions of the examples that are associated with particular
-  versions of the framework.
+v0.9
+====
+_26 Nov 2014_
 
-  In this version of the code, most of the commenting is completed, and most of
-  the unused classes have been removed.  (They can still be easily re-added from
-  the history of the repository, however -- that's the beauty of source
-  control.)
+This is the first marked release.  I put it in place so that it is easier to
+quickly find versions of the examples that are associated with particular
+versions of the framework.
+
+In this version of the code, most of the commenting is completed, and most of
+the unused classes have been removed.  (They can still be easily re-added from
+the history of the repository, however -- that's the beauty of source control.)

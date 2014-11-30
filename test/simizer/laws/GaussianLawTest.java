@@ -8,7 +8,6 @@ import org.junit.Before;
 public class GaussianLawTest extends LawTest {
   @Before
   public void setUp() {
-    law = new GaussianLaw(30);
-    law.setParam(7.5);
+    law = new GaussianLaw(15, 7.5);
   }
 }

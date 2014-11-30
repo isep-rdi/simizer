@@ -15,7 +15,7 @@ import java.lang.reflect.Constructor;
  */
 public abstract class Law {
 
-  protected int upperBound;
+  private Integer upperBound = null;
 
   /**
    * Instantiates a {@code Law} subclass from a string representation.
@@ -41,10 +41,26 @@ public abstract class Law {
     // find the name of the class to instantiate
     Class lawClass = Class.forName(args[0]);
 
-    // use the constructor that takes a single argument to create an instance
+    // find the constructor for the specified number of arguments
     for (Constructor cs : lawClass.getConstructors()) {
-      if (cs.getParameterTypes().length == 1) {
-        lawInstance = (Law) cs.newInstance(Integer.parseInt(args[1]));
+      int argumentCount = args.length - 1;  // skip the class, but use others
+      Class[] parameters = cs.getParameterTypes();
+      if (parameters.length == argumentCount) {
+        Object[] values = new Object[parameters.length];
+
+        int index = 0;
+        for (Class cls : parameters) {
+          if (cls.equals(Integer.class)) {
+            values[index] = Integer.parseInt(args[index + 1]);
+          } else if (cls.equals(Double.class)) {
+            values[index] = Double.parseDouble(args[index + 1]);
+          } else {
+            System.exit(1);
+          }
+          index++;
+        }
+
+        lawInstance = (Law) cs.newInstance(values);
       }
     }
 
@@ -53,39 +69,65 @@ public abstract class Law {
       throw new NullPointerException("Unable to instantiate Law.");
     }
 
-    if (args.length > 2) {
-      lawInstance.setParam(Double.parseDouble(args[2]));
-    }
-
     return lawInstance;
   }
 
   /**
    * Initializes an instance of the {@code Law} class.
-   *
-   * @param upperBound the number of parameters.  Values produced by the law
-   *          will be in the range {@code [0, numberOfParameters)}.
    */
-  public Law(int upperBound) {
+  public Law() {}
+
+  /**
+   * Sets the upper bound for the {@code Law}.
+   * <p>
+   * Once set, this {@code Law} will only return values in the range {@code [0,
+   * upperBound)}.  This can be useful if a {@code Law} is being used to select
+   * values from some sort of a collection with a strict upper bound.
+   * <p>
+   * To remove an upper bound that has previously been set, use {@link
+   * #removeUpperBound()}.
+   *
+   * @param upperBound the upper bound to use
+   */
+  public void setUpperBound(int upperBound) {
     this.upperBound = upperBound;
   }
 
   /**
-   * Changes the custom parameter associated with this {@code Law}.
-   * <p>
-   * This method is here to provide subclasses with a consistent interface for
-   * defining an additional parameter.  For example, the {@link GaussianLaw}
-   * uses it to allow the standard deviation of the distribution to be
-   * customized.
-   *
-   * @param parameter change the custom parameter
+   * Removes the upper bound restriction for this {@code Law} instance.
    */
-  public void setParam(double parameter) {};
+  public void removeUpperBound() {
+    this.upperBound = null;
+  }
 
   /**
    * Generates the next random value for this {@code Law}.
+   * <p>
+   * If there is an upper bound specified, then this method will return a value
+   * in the range [0, upperBound).  Otherwise, this will return any valid
+   * non-negative value from the Law's distribution.
+   * <p>
+   * If a generated value is outside of this range, new values will be generated
+   * until one is within the acceptable range.
    *
-   * @return a value in the range {@code [0, upperBound)}
+   * @return a value from the distribution
    */
-  public abstract int nextValue();
+  public final int nextValue() {
+    int result;
+    do {
+      result = generateNextValue();
+    } while (result < 0
+              || (this.upperBound != null && result >= this.upperBound));
+    return result;
+  }
+
+  /**
+   * Generates the next value from the distribution.
+   * <p>
+   * This should not enforce any restriction on the upper bound.  That logic is
+   * handled internally within the Law class.
+   *
+   * @return a value from the distribution
+   */
+  protected abstract int generateNextValue();
 }

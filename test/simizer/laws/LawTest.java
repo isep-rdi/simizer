@@ -1,6 +1,5 @@
 package simizer.laws;
 
-import java.lang.reflect.Field;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -15,6 +14,7 @@ public class LawTest {
   /**
    * Outputs values from the law to evaluate their distribution.
    */
+  @Ignore
   @Test
   public void testOutput() {
     for (int i = 0; i < 10000; i++) {
@@ -29,9 +29,8 @@ public class LawTest {
    */
   @Test
   public void testMaximum() throws Exception {
-    Field upperBound = Law.class.getDeclaredField("upperBound");
-    upperBound.setAccessible(true);
-    int bound = (Integer) upperBound.get(law);
+    int bound = 20;
+    law.setUpperBound(bound);
 
     long target = System.currentTimeMillis() + 4*1000;
 

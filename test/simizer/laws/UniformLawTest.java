@@ -4,6 +4,8 @@ import org.junit.Before;
 
 /**
  * Tests the behavior of the UniformLaw class.
+ *
+ * @author Max Radermacher
  */
 public class UniformLawTest extends LawTest {
   @Before

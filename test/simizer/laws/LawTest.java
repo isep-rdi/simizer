@@ -6,6 +6,8 @@ import org.junit.Test;
 
 /**
  * Basic tests that should be run on all Law subclasses.
+ *
+ * @author Max Radermacher
  */
 @Ignore
 public class LawTest {

@@ -9,6 +9,8 @@ import org.junit.Test;
 
 /**
  * Tests for the {@code ResourceFactory} class.
+ *
+ * @author Max Radermacher
  */
 public class ResourceFactoryTest {
   private ResourceFactory factory = null;

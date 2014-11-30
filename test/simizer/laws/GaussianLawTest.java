@@ -4,6 +4,8 @@ import org.junit.Before;
 
 /**
  * Tests the behavior of the GaussianLaw class.
+ *
+ * @author Max Radermacher
  */
 public class GaussianLawTest extends LawTest {
   @Before

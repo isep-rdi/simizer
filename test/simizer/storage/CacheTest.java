@@ -6,6 +6,8 @@ import org.junit.Test;
 
 /**
  * Tests for the {@code Cache} class.
+ *
+ * @author Max Radermacher
  */
 public class CacheTest {
   private Cache cache = null;

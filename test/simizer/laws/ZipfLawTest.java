@@ -5,7 +5,7 @@ import org.junit.Before;
 /**
  * Tests for the ZipfLaw class.
  * 
- * @author Max Radermacher <max.radermacher@gmail.com>
+ * @author Max Radermacher
  */
 public class ZipfLawTest extends LawTest {
   @Before

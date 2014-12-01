@@ -25,13 +25,20 @@ import simizer.storage.Resource;
 import simizer.storage.StorageElement;
 
 /**
- * This class models a virtual Machine. It can host several @see Application
- * through the use of the Deploy method. Provides interface for the Applications
- * to read() write() and execute(). Handles TaskSession creations
+ * Represents a virtual machine in the simulation.
+ * <p>
+ * These machines are used to host the application-specific {@link Application}
+ * instances.  A single {@code VM} can host multiple {@link Application}s.  To
+ * add a new instance to the {@code VM}, use the {@link
+ * #deploy(simizer.app.Application)} method.
+ * <p>
+ * In addition, this class provides a series of methods (through the use of the
+ * {@link TaskScheduler} class) that can be used to perform various file,
+ * network, and processor operations while in the process of handling a {@link
+ * Request}.
  *
  * TODO: add a started state check
- * @see TaskSession
- *
+ * 
  * @author slefebvr
  */
 public class VM extends Node implements IEventProducer {
@@ -139,11 +146,9 @@ public class VM extends Node implements IEventProducer {
     idToApp.put(application.getId(), application);
     memoryUsed += application.getMemorySize();
     if (started) {
-      application.init();
+      startApplication(application);
     }
   }
-
-  private void startApplication(Application application) {}
 
   /**
    * Starts the {@code VM} (by starting each {@code Application}).
@@ -155,12 +160,21 @@ public class VM extends Node implements IEventProducer {
    */
   @Override
   public void start() {
-    initTaskSession();
     for (Application app : idToApp.values()) {
-      app.init();
+      startApplication(app);
     }
     started = true;
-    executeTaskSession();
+  }
+
+  /**
+   * Starts an application, creating and scheduling the initialization tasks.
+   * 
+   * @param application the {@link Application} to start
+   */
+  private void startApplication(Application application) {
+    TaskScheduler scheduler = this.new TaskScheduler();
+    application.init(scheduler);
+    getProcessingUnit().scheduleTask(scheduler.getTaskSession(), clock);
   }
 
   /**
@@ -178,16 +192,16 @@ public class VM extends Node implements IEventProducer {
   public void onRequestReceived(Node source, Request request) {
     activeRequestCount++;
     
-    initTaskSession();
     Application app = idToApp.get(request.getApplicationId());
 
+    TaskScheduler scheduler = this.new TaskScheduler();
     if (app == null) {
       request.reportErrors(1);
-      this.sendResponse(request, source);
+      scheduler.sendResponse(request, source);
     } else {
-      app.handle(source, request);
+      app.handle(scheduler, source, request);
     }
-    executeTaskSession();
+    getProcessingUnit().scheduleTask(scheduler.getTaskSession(), clock);
   }
 
   /**
@@ -289,31 +303,6 @@ public class VM extends Node implements IEventProducer {
   }
 
   /**
-   * Initializes a new {@code TaskSession} to schedule {@code Task}s.
-   * <p>
-   * A new {@link TaskSession} is created for each {@link Request} that is
-   * handled.  In addition, a new {@link TaskSession} is created for the
-   * initialization phase of each {@link Application}.
-   */
-  private void initTaskSession() {
-    if (currentTaskSession == null) {
-      currentTaskSession = new TaskSession(0);
-    }
-  }
-
-  /**
-   * Runs the current {@code TaskSession}.
-   * <p>
-   * When a request or initialization operation has finished running, the
-   * associated {@code TaskSession} is given to the {@link TaskProcessor} to be
-   * executed.
-   */
-  private void executeTaskSession() {
-    getProcessingUnit().scheduleTask(currentTaskSession, clock);
-    currentTaskSession = null;
-  }
-
-  /**
    * Called when the {@code TaskSession} has ended.
    *
    * @param taskSession the {@link TaskSession} that ended
@@ -324,146 +313,189 @@ public class VM extends Node implements IEventProducer {
   }
 
   /**
-   * Adds a read {@code Task} to the current {@code TaskSession}.
-   *
-   * @param resourceId the ID of the resource to read
-   * @param size the number of bytes to read.  This parameter does not need to
-   *            be equal to the size of the file.  If it is less than the size
-   *            of the file, it implies that only part of the file is being
-   *            read.
-   * @return the {@link Resource} if the operation is successful, null if it
-   *         fails
-   */
-  public Resource read(int resourceId, int size) {
-    Resource res = disk.read(resourceId);
-
-    if (res != null) {
-      currentTaskSession.addTask(new DiskTask(this, size, res, IOType.READ));
-    }
-
-    return res;
-  }
-
-  /**
-   * Adds a read {@code Task} to the current {@code TaskSession}.
+   * Handles the scheduling of tasks to complete a request/operation.
    * <p>
-   * This method simulates reading the entire {@link Resource} from the disk.
-   * 
-   * @param resourceId the ID of the resource to read
-   * @return the {@link Resource} if the operation is successful, null if it
-   *         fails
+   * As I was working with the framework, I found it slightly confusing to know
+   * which methods would add an operation to the {@link TaskSession} and which
+   * ones wouldn't.  Most of the ones here did, but it wasn't necessarily all
+   * of them (for example, see {@link #send(simizer.requests.Request,
+   * simizer.network.MessageReceiver, long)}).  To combat this problem, I added
+   * a class where <strong>all</strong> of the methods add an operation with a
+   * {@link Task}.  This instance is passed to the various handlers so that they
+   * can construct the {@link TaskSession}.
+   * <p>
+   * In addition, there are a fair number of methods throughout the application
+   * that have very similar (or the same) names.  This will hopefully help to
+   * distinguish some of them.  For example, when you use {@code
+   * scheduler.read()}, it should be obvious that its doing the same thing as
+   * the {@code read()} method, but with the assistance of the {@code
+   * scheduler}.
    */
-  public Resource read(int resourceId) {
-    Resource res = disk.read(resourceId);
-    if (res != null) {
-      return read(resourceId, (int) res.size());
-    }
-    return res;
-  }
-
-  /**
-   * Adds a write {@code Task} to the current {@code TaskSession}.
-   *
-   * If the Resource already exists on the local disk, it is modified.
-   *
-   * @see Resource
-   * @see IOType
-   * @param res
-   * @param sz
-   * @return 0 if created, -1 if failure to write (eg. not enough space).
-   */
-  public int write(Resource res, int sz) {
-    if (disk.getUsedSpace() + sz > disk.getCapacity()) {
-      return -1;
+  public class TaskScheduler {
+    private final TaskSession session;
+    public TaskScheduler() {
+      this.session = new TaskSession(0);
     }
 
-    currentTaskSession.addTask(
-            new DiskTask(this, sz, res, IOType.WRITE));
-    return 0;
-  }
-
-  /**
-   * Adds a MODIFY DiskTask to the current task Session.
-   *
-   * @param resourceId
-   * @param sz Size after modification
-   * @return Version number of the resource, 0 if created, -1 if failure to
-   * write.
-   */
-  public int modify(int resourceId, int sz) {
-    if (!disk.contains(resourceId)) {
-      return -1;
-    }
-    Resource res = disk.read(sz);
-    if (disk.getUsedSpace() + (sz - res.size()) > disk.getCapacity()) {
-      return -1;
+    private TaskSession getTaskSession() {
+      return session;
     }
 
-    currentTaskSession.addTask(
-            new DiskTask(this, sz, res, IOType.MODIFY));
-    return res.getVersion() + 1;
-  }
-
-  /**
-   * Adds a processing {@code Task} to the current {@code TaskSession}.
-   *
-   * @param nbInstructions
-   * @param memSize
-   * @param res
-   * @return 0 if success
-   */
-  public int execute(long nbInstructions, int memSize, List<Resource> res) {
-    currentTaskSession.addTask(new ProcTask(nbInstructions, memSize));
-    return 0;
-  }
-
-  /**
-   * Starts a requesting session, Adds a send task to current task session, this
-   * request waits for an answer before continuing to the next task in the
-   * session Request handling should return after calling this method.
-   *
-   * @see Application#sendRequest(Node, Request)
-   * @param dest
-   * @param req
-   * @return whether or not the {@link Request} could be sent to the specified
-   *             {@link Node}
-   */
-  public boolean sendRequest(Node dest, Request req) {
-    //req.setClientStartTimestamp(clock);
-    if (getNetwork().getNode(dest.getId()) != null) {
-      currentTaskSession.addTask(new SendTask(req, dest, this));
-      // currentTaskSession.complete();
-      return true;
+    /**
+    * Adds a read {@code Task} to the {@code TaskSession}.
+    *
+    * @param resourceId the ID of the resource to read
+    * @param size the number of bytes to read.  This parameter does not need to
+    *            be equal to the size of the file.  If it is less than the size
+    *            of the file, it implies that only part of the file is being
+    *            read.
+    * @return the {@link Resource} if the operation is successful, null if it
+    *         fails
+    */
+    public Resource read(Integer resourceId, int size) {
+      Resource res = disk.read(resourceId);
+      if (res != null) {
+        session.addTask(new DiskTask(VM.this, size, res, IOType.READ));
+      }
+      return res;
     }
-    return false;
-  }
 
-  /**
-   * Sends back a response to a request. Completes the current tasks session.
-   * Request handling should return after calling this method.
-   *
-   * @see Application
-   * @param dest
-   * @param req
-   * @return returns false if the {@link Request} cannot be sent to the
-   *             specified {@link Node} OR if the {@link Request} is not in its
-   *             "response" state.  (Meaning that the {@link Request} should
-   *             have already been sent by the client.)
-   */
-  public boolean sendResponse(Request req, Node dest) {
-    if (getNetwork().getNode(dest.getId()) == null || req.getClientStartTimestamp() < 0) {
+    /**
+    * Adds a read {@code Task} to the {@code TaskSession}.
+    * <p>
+    * This method simulates reading the entire {@link Resource} from the disk.
+    *
+    * @param resourceId the ID of the resource to read
+    * @return the {@link Resource} if the operation is successful, null if it
+    *         fails
+    */
+    public Resource read(Integer resourceId) {
+     Resource res = disk.read(resourceId);
+     if (res != null) {
+       return read(resourceId, (int) res.size());
+     } else {
+       return null;
+     }
+    }
+
+    /**
+     * Adds a write {@code Task} to the {@code TaskSession}.
+     * <p>
+     * If the Resource already exists on the local disk, it is modified.
+     *
+     * @param resource
+     * @param size
+     * @return 0 if created, -1 if failure to write (eg. not enough space).
+     */
+    public int write(Resource resource, int size) {
+      if (disk.getUsedSpace() + size > disk.getCapacity()) {
+        return -1;
+      }
+
+      session.addTask(new DiskTask(VM.this, size, resource, IOType.WRITE));
+      return 0;
+    }
+
+    /**
+     * Adds a modify task to the {@code TaskSession}.
+     *
+     * @param resourceId the ID of the {@link Resource} to modify
+     * @param size the size after modification
+     * @return the version number of the resource (this will be 0 if it was just
+     *         created), or -1 to indicate some sort of failure
+     */
+    public int modify(Integer resourceId, int size) {
+      if (!disk.contains(resourceId)) {
+        return -1;
+      }
+      Resource res = disk.read(size);
+      if (disk.getUsedSpace() + (size - res.size()) > disk.getCapacity()) {
+        return -1;
+      }
+
+      session.addTask(new DiskTask(VM.this, size, res, IOType.MODIFY));
+      return res.getVersion() + 1;
+    }
+
+    /**
+     * Adds a processing {@code Task} to the {@code TaskSession}.
+     *
+     * @param nbInstructions the number of instructions needed to complete the
+     *            {@link ProcTask}
+     * @param memSize the amount of memory needed to complete the {@link
+     *            ProcTask}
+     * @param resources the IDs of the {@link Resource}s needed to complete the
+     *            {@link ProcTask}
+     * @return zero, always
+     */
+    public int execute(long nbInstructions, int memSize, List<Resource> resources) {
+      session.addTask(new ProcTask(nbInstructions, memSize));
+      return 0;
+    }
+
+    /**
+     * Starts a requesting session, adding a send task to {@code TaskSession}.
+     * <p>
+     * Using this method waits for an answer before continuing to the next task
+     * in the session (sshhh... no it doesn't).  Request handling should return
+     * after calling this method.  (This needs to be updated depending on what
+     * the requirements are.)
+     *
+     * @param destination where the {@link Request} should be sent
+     * @param request the {@link Request} to send
+     * @return whether or not the {@link Request} could be sent to the specified
+     *         {@link Node}
+     */
+    public boolean sendRequest(Node destination, Request request) {
+      if (getNetwork().getNode(destination.getId()) != null) {
+        session.addTask(new SendTask(request, destination, VM.this));
+        return true;
+      }
       return false;
     }
 
-    // target node exists and request is valid
-    currentTaskSession.addTask(new SendTask(req, dest, this));
+    /**
+     * Sends back a response to a request.
+     * <p>
+     * Completes the current {@link TaskSession}.  Request handling should
+     * return after calling this method.  (This needs to be updated with the
+     * actual behavior of the application.)
+     *
+     * @param request the {@link Request} (or rather, response) to send
+     * @param destination the {@link Node} where the {@link Request} should be
+     *            sent
+     * @return returns false if the {@link Request} cannot be sent to the
+     *         specified {@link Node} OR if the {@link Request} is not in its
+     *         "response" state.  (Meaning that the {@link Request} should have
+     *         already been sent by the client.)
+     */
+    public boolean sendResponse(Request request, Node destination) {
+      if (getNetwork().getNode(destination.getId()) == null || request.getClientStartTimestamp() < 0) {
+        return false;
+      }
 
-    return true;
+      // target node exists and request is valid
+      session.addTask(new SendTask(request, destination, VM.this));
+
+      return true;
+    }
+
+    /**
+     * Sends a {@code Request} without waiting for a response.
+     * <p>
+     * This needs to be updated once the intended behavior is determined and
+     * implemented.  However, given the implementation of this method, I suspect
+     * that the intended behavior was never fully implemented.
+     * 
+     * @param node the {@link Node} where the {@link Request} should be sent
+     * @param request the {@link Request} to send
+     * @return whether or not {@code request} could be sent to {@code node}
+     */
+    public boolean sendOneWay(Node node, Request request) {
+      return sendRequest(node, request);
+    }
+
   }
-
-
-
-
 
   @Override
   public Channel getOutputChannel() {

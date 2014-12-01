@@ -1,13 +1,12 @@
 package simizer.app;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import simizer.nodes.Node;
 import simizer.nodes.VM;
+import simizer.nodes.VM.TaskScheduler;
 import simizer.requests.Request;
-import simizer.storage.Resource;
 
 /**
  * Represents a running process on VM.
@@ -23,8 +22,7 @@ public abstract class Application {
   private final Integer id;
 
   /** The amount of memory used by this {@code Application}. */
-  
-  private final int memorySize;
+  private final long memorySize;
 
   /**
    * The {@code VM} on which this {@code Application} is being run.
@@ -47,7 +45,7 @@ public abstract class Application {
    * @param id the ID of the application
    * @param memorySize the memory footprint for the application
    */
-  public Application(Integer id, int memorySize) {
+  public Application(Integer id, long memorySize) {
     this.id = id;
     this.memorySize = memorySize;
   }
@@ -85,7 +83,7 @@ public abstract class Application {
    *
    * @return the amount of memory used by the {@code Application}
    */
-  public int getMemorySize() {
+  public long getMemorySize() {
     return memorySize;
   }
 
@@ -112,8 +110,10 @@ public abstract class Application {
    * Performs initialization logic when the {@code Application} starts running.
    * <p>
    * Subclasses must override this method to provide application-specific logic.
+   *
+   * @param scheduler the {@link TaskScheduler} where the actions should be put
    */
-  public abstract void init();
+  public abstract void init(TaskScheduler scheduler);
 
   /**
    * Handles requests from clients.
@@ -121,60 +121,12 @@ public abstract class Application {
    * Subclasses must override this method with their application-specific logic.
    * The method is used to handle requests sent from clients to the server.
    *
+   * @param scheduler the {@link TaskScheduler} where the actions should be put
    * @param origin the {@link Node} that sent the {@link Request}.  This is the
    *            {@link Node} where the server should send its response.
    * @param request the {@link Request} sent by the client
    */
-  public abstract void handle(Node origin, Request request);
-
-  protected int write(Resource res, int sz) {
-    return vm.write(res, sz);
-  }
-
-  /**
-   * Adds a MODIFY DiskTask to the current task Session.
-   *
-   * @param resourceId
-   * @param sz Size after modification
-   * @return Version number of the resource, 0 if created, -1 if failure to
-   * write.
-   */
-  protected int modify(int resourceId, int sz) {
-    return vm.modify(resourceId, sz);
-  }
-
-  /**
-   * Adds a processing task to the current task session;
-   *
-   * @param nbInstructions
-   * @param memSize
-   * @param res
-   * @return 0 if success
-   */
-  protected int execute(long nbInstructions, int memSize, List<Resource> res) {
-    return vm.execute(nbInstructions, memSize, res);
-  }
-
-  protected Resource read(int resourceId) {
-    return vm.read(resourceId);
-  }
-
-  protected Resource read(int resourceId, int sz) {
-    return vm.read(resourceId, sz);
-  }
-
-  protected boolean sendRequest(Node dest, Request req) {
-    pending.put(req.getId(), dest);
-    return vm.sendRequest(dest, req);
-  }
-
-  protected boolean sendResponse(Node dest, Request req) {
-    pending.remove(req.getId());
-    return vm.sendResponse(req, dest);
-  }
-
-  protected boolean sendOneWay(Node n, Request request) {
-    return sendRequest(n, request);
-  }
+  public abstract void handle(TaskScheduler scheduler,
+          Node origin, Request request);
 
 }

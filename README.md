@@ -1,183 +1,193 @@
-# Overview
+# The Simizer Project
 
-Simizer is a distributed application simulator.  This document will explain the general structure of the framework.
+Simizer is a distributed application simulator.  It can be used to simulate the
+behavior of cloud platforms without the need to deploy an application on an
+actual cloud infrastructure (which takes both time and money).  Instead, the
+framework can be used to quickly run a simulation, modify the parameters, and
+then run the simulation again.
 
-## Properties
+## Overview
 
   - Simizer is written in Java.
-  - It is designed to enable the comparison protocols performance.
+  - It is designed to compare various implementations of algorithms and
+    protocols in a controlled environment.
 
-# Project Description
+## Goals
 
-## Why a new simulator?
+  - To operate at the virtual machine level rather than the hardware level.
+  - To provide a simple API to implement polcies:
+    + for load balancing
+    + for data consistency (at a large scale)
+  - To be easy to learn and use.
 
-Trade offs in large distributed systems:
-  - Consistency VS Availability: Partition and fault tolerance
-  - Consistency VS Latency: System performance ->  QoS and SLAs
-  - Cloud infrastructure issues:  Unpredictable latency variations (shared physical architectures)
+## Motivation
 
-Existing simulators:
- - CloudSim [http://www.cloudbus.org/cloudsim/]
- - SimGRID [http://simgrid.gforge.inria.fr/]
- - OptorSim [http://sourceforge.net/projects/optorsim/]
+Why do we need a new simulator?  Aren't there already simulators on the market
+that accomplish what we are trying to do?  The existing frameworks focus on the
+study of physical infrastructure rather than the algorithms.
 
-$→$ mainly focus on physical infrastructure simulation and study.
+When using and developing these simulators, it is necessary to consider the
+trade-offs present in these large distributed systems:
 
-## The Simizer Project
+  - Consistency vs. Availability: Partition and fault tolerance
+  - Consistency vs. Latency: System performance -> QoS and SLAs
+  - Cloud infrastructure issues: Unpredictable latency variations (shared
+    physical architectures)
 
-1. Started as a small load balancing simulator in 2012
-2. Derived from the need to simulate Amazon EC2 deployments
-3. Extended to support diverse protocols and geographic distribution of datacenters and clients
+Here is a short list of existing simulators:
 
-$→$ Objective to integrate directly with load balancer
+  - [CloudSim](http://www.cloudbus.org/cloudsim/)
+  - [SimGRID](http://simgrid.gforge.inria.fr/)
+  - [OptorSim](http://sourceforge.net/projects/optorsim/)
 
-## Project Goals
+## History
 
-- Provide means to simulate consistency policies at large scale
-- Provide a simple API to implement policies
-- Provide a simple JSON based system model specification
-- Simulation at virtual machine level rather than hardware level
+1. _Simizer_ started as a small load balancing simulator in 2012.
+2. The motivation for its development was the need to simulate Amazon EC2
+   deployments.
+3. Over time, it has been extended to support diverse protocols and geographic 
+   distribution of data centers and clients.
+
 
 # Quickstart
 
-Replay a simulation:
-- to launch lbsim you need:
-+ A load balancing policy
-+ A requests sequence file (.csv)
-+ A node description file (.json)
-example:
-here is the command line to run simulation:
-java -cp ./dist/lbsim.jar lbsim.Lbsim run ./5nodes.json ./reqDescription_v1.csv ./workload_gene_v1.csv ./test lbsim.policies.RoundRobin
+The included examples are a good place to start learning how to use the
+framework.  There is an included tutorial that starts at square one and works
+its way up to some rather complex examples.
 
-./5nodes.json -> node description file
-./reqDescription_v1.csv -> request description file
-./workload_gene_v1.csv -> workload description file
-./test -> ressource description file (not implemented yet...)
-lbsim.policies.RoundRobin -> load balancing policy
+Also included in the examples framework are the tools needed to start building
+applications that take advantages of the included load balancing applications
+and code.
+
+To get started, visit the releases page and download the latest release.
+Extract the file, then navigate to the tutorials directory to get started.
 
 
+# Uses
 
-You can generate a new trace:
-java -cp ./dist/lbsim.jar lbsim.Lbsim generate wl.conf ./reqDescription_v1.csv 10 200 30 > workload_gene_v1.csv
+## Load Balancing Analysis
 
-4 The Task API: Writing protocols and simulating apps in Simizer 
-=================================================================
+The _Simizer_ framework comes with everything needed to simulate the
+characteristics of various load balancing algorithms.
 
-4.1 A Simple API for designing protocols 
------------------------------------------
+Several implementations of common load balancing algorithms, such as Round
+Robin, Cost-Aware, and others are included with the examples add-on to the
+framework.
 
-4.1.1 Optimistic policy example 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-  public class OptimisticPolicy implements StoreApplication {
-    public Request write(Request r) {
-      // local write
-      Integer id= r.getResourceId();
-      Resource res= disk.write(id);
-      // Replication to other nodes
-      for(Node n: HashRing.getNodes(id))
-        sendRequest("replicate",res,n, r.getArrivalTime());    
-      return r;
-      }
-      public Request read(Request r) {
-        Integer id= r.getResourceId();
-        Resource res= disk.read(id);
-        // Resource checking
-        if(res == null) r.setError(r.getError()+1);
-        return sendResponse(r, res);
-      }
-  
-      public Request replicate(Request r) {
-        Resource res = r.getResource();
-        // Check version
-        if(res.getWritetime() > disk.read(res.getId()).getWriteTime())
-          disk.write(res);
-        return r;
-      }
+## Consistency Analysis
 
 
-4.2 Application example: 
--------------------------
+# API Features
 
-4.2.1 Modelling a weather map interpolation application 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## Tasks
 
-
-
-  public class InterpolationApp extends Application {
-        private static int KILO = 1024;
-  
-      public InterpolationApp() {
-          super(0,128*KILO*KILO);
-  
-      }
-      public InterpolationApp(int port) {
-          super(port,128*KILO*KILO);
-      }
-      @Override
-      public void init() {
-          Request registerRequest = new Request("register");
-          registerRequest.setAppId(0);
-          vm.send(registerRequest, 
-                      vm.getNetwork().getNode(Integer.parseInt(config.getProperty("frontend"))));
-      }
-      /**
-       * Adds the frontend id to application configuration
-       * @param ftdId 
-       */
-      public void setFrontend(int ftdId) {
-          this.config.setProperty("frontend", Integer.toString(ftdId));
-      }
-      @Override
-      public void handle(Node orig, Request req) {
-  
-          List<Resource> rList =new ArrayList<>();
-  
-          for(Integer rId: req.getResources()) {
-              Resource r = vm.read(rId, 15 *KILO);
-              if(r!=null)
-                  rList.add(r);
-          }
-          // If some files don't exist we send an error back to the
-          // client.
-          if(rList.size() == req.getResources().size()) {
-              long nbInst = 24*15*1500*rList.size();
-               vm.execute(nbInst, 15*KILO*rList.size(), rList);
-          }
-          else {
-              req.setError(req.getResources().size() - rList.size());
-          }
-          vm.sendResponse(req, orig);
-    }   
+```java
+public class OptimisticPolicy implements StoreApplication {
+  public Request write(Request r) {
+    // local write
+    Integer id= r.getResourceId();
+    Resource res= disk.write(id);
+    // Replication to other nodes
+    for(Node n: HashRing.getNodes(id))
+      sendRequest("replicate",res,n, r.getArrivalTime());
+    return r;
   }
 
-5 Developments 
-===============
+  public Request read(Request r) {
+    Integer id= r.getResourceId();
+    Resource res= disk.read(id);
+    // Resource checking
+    if(res == null) r.setError(r.getError()+1);
+    return sendResponse(r, res);
+  }
+  
+  public Request replicate(Request r) {
+    Resource res = r.getResource();
+    // Check version
+    if(res.getWritetime() > disk.read(res.getId()).getWriteTime())
+      disk.write(res);
+    return r;
+  }
+}
+```
 
-5.1 Task API 
--------------
+## Applications
 
-5.1.1 TODO Generic Request / Response / send One Way system 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-- In order to this we need by application two lists: pendingResponses and pendingClients.
+Consider an application that interpolates weather maps.  Using the _Simizer_
+framework, we can easily write an application that simulates the basic behavior.
 
-5.1.2 TODO More complex protocols will require DSL or byte code manipulation 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The general idea of this application is as follows:
 
-5.2 Network Simulation 
------------------------
+  - the application receives a request (containing application-specific metadata)
+  - the server reads the required resources from the disk (by using the framework,
+    these coud come from an HDD or a cache)
+  - the server performs some processing, proportional to the number of resources
+  - the servers sends a response back to the client
 
-5.2.1 TODO For accuracy: integration with Cloud Sim (network model) 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```java
+public class InterpolationApp extends Application {
 
-5.3 Misc 
----------
+  public InterpolationApp(int port) {
+    super(port, 128 * StorageElement.MEGABYTE);
+  }
 
-5.3.1 TODO Cleanup code before pushing to github 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+ Code available @  [http://forge.isep.fr/projects/simizer]
+  @Override
+  public void init(TaskScheduler scheduler) {
+    Request registerRequest = new Request(0, "", "register");
+
+    Node destination = vm.getNetwork().getNode(
+            Integer.parseInt(config.getProperty("frontend")));
+    scheduler.sendRequest(destination, registerRequest);
+  }
+
+  @Override
+  public void handle(TaskScheduler scheduler, Node orig, Request req) {
+    List<Resource> rList = new ArrayList<>();
+
+    // STEP ONE: Read each of the required resources.
+    // By using the "scheduler", we utilize the simulation capabilities of
+    // simizer.  We'll read the resources one after another.
+    for (Integer rId : req.getResources()) {
+      Resource r = scheduler.read(rId, (int) (15 * StorageElement.KILOBYTE));
+      if (r != null) {
+        rList.add(r);
+      }
+    }
+
+    // STEP TWO: Process the files.
+    // If there are files missing, we mark this as an error.
+    if (rList.size() == req.getResources().size()) {
+      long nbInst = 24 * 15 * 1500 * rList.size();
+      int memSize = 15 * (int) StorageElement.KILOBYTE * rList.size();
+      scheduler.execute(nbInst, memSize, rList);
+    } else {
+      req.reportErrors(req.getResources().size() - rList.size());
+    }
+
+    // STEP THREE: Send a response back to the client.
+    // This will only happen after the simulation of the above "read" and
+    // "execute" operations.
+    scheduler.sendResponse(req, orig);
+  }
+
+}
+```
 
 
-5.3.2 TODO GUI -> realtime graphing 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Future Developments
+
+## Network Simulation
+
+For accuracy in network transmissions, consider integrating with the _CloudSim_
+framework.
+
+## GUI Analysis
+
+Currently, the output from the application is not particuarly "pretty."  A
+separate application (or an addition to the _Simizer_ framework) could be added
+that allows the results of a simulation to be viewed in a more graphical,
+easier-to-understand manner.
+
+This GUI could even include some sort of realtime graphing output during the
+simulation.  (This may require running the simulation in realtime as opposed to
+"as fast as we possibly can.")

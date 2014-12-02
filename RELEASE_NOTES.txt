@@ -1,3 +1,30 @@
+v0.9.2
+======
+_03 Dec 2014_
+
+This update prepares the framework for the tutorials focusing on `Application`,
+`Resource`/`ResourceFactory`, `ClientGenerator`, and `LoadBalancer` features.
+It also includes some fixes for the development of the first tutorial.
+
+Specific changes made in this release include:
+
+- Making the `Law` constructors easier to understand.  The constructor for each
+  subclasses is now much more applicable to that specific subclass.
+
+- Making it more obvious when a `TaskSession` is or is not in use.  There were
+  methods throughout multiple classes that were named more or less the same
+  thing, and this update works to address some of those issues.  It does this by
+  introducing a new `TaskScheduler` object for `Application` instances to use.
+
+- Adjusting the "parameters" of `Request` objects.  The format of these
+  parameters (now referred to as the `query`) is much more consistent with URL
+  query strings.  This should make it easier when designing custom simulations
+  that don't fit into the mold of the original aims of the framework.
+
+- The README file was also cleaned up so that it provides more recent
+  information.
+
+
 v0.9.1
 ======
 _30 Nov 2014_

@@ -30,7 +30,7 @@ import java.util.Map;
  * These machines are used to host the application-specific {@link Application}
  * instances.  A single {@code VM} can host multiple {@link Application}s.  To
  * add a new instance to the {@code VM}, use the {@link
- * #deploy(simizer.app.Application)} method.
+ * #deploy(Application)} method.
  * <p>
  * In addition, this class provides a series of methods (through the use of the
  * {@link TaskScheduler} class) that can be used to perform various file,
@@ -318,11 +318,10 @@ public class VM extends Node implements IEventProducer {
    * As I was working with the framework, I found it slightly confusing to know
    * which methods would add an operation to the {@link TaskSession} and which
    * ones wouldn't.  Most of the ones here did, but it wasn't necessarily all
-   * of them (for example, see {@link #send(simizer.requests.Request,
-   * simizer.network.MessageReceiver, long)}).  To combat this problem, I added
-   * a class where <strong>all</strong> of the methods add an operation with a
-   * {@link Task}.  This instance is passed to the various handlers so that they
-   * can construct the {@link TaskSession}.
+   * of them (for example, see {@link #send(Request, MessageReceiver, long)}).
+   * To combat this problem, I added a class where <strong>all</strong> of the
+   * methods add an operation with a {@link Task}.  This instance is passed to
+   * the various handlers so that they can construct the {@link TaskSession}.
    * <p>
    * In addition, there are a fair number of methods throughout the application
    * that have very similar (or the same) names.  This will hopefully help to

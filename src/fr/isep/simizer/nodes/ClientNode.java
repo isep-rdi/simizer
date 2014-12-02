@@ -95,8 +95,7 @@ public class ClientNode extends Node {
    * Creates a client that sends requests until it expires.
    * <p>
    * Clients expire after an amount of time defined by the {@code durationLaw}.
-   * See {@link #configureLaws(simizer.laws.Law, simizer.laws.Law,
-   * simizer.laws.Law)} for a description of the laws.
+   * See {@link #configureLaws(Law, Law, Law)} for a description of the laws.
    *
    * @param startTime the time when the client should begin its operations
    */

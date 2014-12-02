@@ -37,11 +37,11 @@ public abstract class TaskProcessor extends EventProducer {
   /**
    * Runs the specified {@code Task}.
    * <p>
-   * This method performs the {@link Task#run(simizer.processor.TaskProcessor,
-   * long)} method of the specified {@link Task}.  Subclasses can override this
-   * method to provide additional functionality or behavior for specific types
-   * of tasks.  In addition, a lot of functionality can be implemented within
-   * the tasks themselves.
+   * This method performs the {@link Task#run(TaskProcessor, long)} method of
+   * the specified {@link Task}.  Subclasses can override this method to provide
+   * additional functionality or behavior for specific types of tasks.  In
+   * addition, a lot of functionality can be implemented within the tasks
+   * themselves.
    *
    * @param task the {@link Task} to run
    * @param timestamp the current timestamp of the simulation

@@ -11,9 +11,8 @@ import fr.isep.simizer.Simulation;
  * class will likely provide a wrapper to an internal {@link EventProducer}
  * instance.
  * <p>
- * The {@link Simulation} will automatically call {@link
- * #setChannel(simizer.event.Channel)} for classes that implement this
- * interface.
+ * The {@link Simulation} will automatically call {@link #setChannel(Channel)}
+ * for classes that implement this interface.
  */
 public interface IEventProducer {
 

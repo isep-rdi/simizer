@@ -2,7 +2,7 @@
  * Provides the entry point for the simulation.
  * <p>
  * This package provides two classes to help with the simulation.  The first is
- * the {@link simizer.Simulation} class, which can be used in custom
+ * the {@link fr.isep.simizer.Simulation} class, which can be used in custom
  * applications that link against the Simizer framework to run a simulation.
  * This allows for the most control and customized behavior when using the
  * framework.

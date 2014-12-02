@@ -67,6 +67,6 @@ public class PrettyRequestPrinter extends RequestPrinter {
 
         request.getApplicationId(),
         request.getAction(),
-        request.getParameters());
+        request.getQuery());
   }
 }

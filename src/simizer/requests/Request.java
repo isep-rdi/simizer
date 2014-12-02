@@ -1,7 +1,10 @@
 package simizer.requests;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import simizer.network.Network;
@@ -14,8 +17,6 @@ public class Request {
 
   private final Long id;
   private int node = -1;
-  
-  private List<Integer> rscList;
 
   /**
    * The ID of the {@code Application} that should handle the {@code Request}.
@@ -25,8 +26,9 @@ public class Request {
   /** The action that the {@code Application} should perform. */
   protected String action;
 
-  /** The parameter string to pass to the handler. */
-  protected String params;
+  /** The query string to pass to the handler. */
+  protected String query;
+  protected Map<String, String> parameters = null;
 
   private long nbInstructions;  // @deprecated
   long procTime;  // @deprecated
@@ -72,7 +74,7 @@ public class Request {
     }
   }
 
-  public Request(Integer applicationId, String action, String parameters,
+  public Request(Integer applicationId, String action, String query,
       boolean isTemplate) {
 
     this(isTemplate);
@@ -80,15 +82,13 @@ public class Request {
     // set the configurable properties
     this.applicationId = applicationId;
     this.action = action;
-    this.params = parameters;
+    this.query = query;
+    this.parameters = parseQuery(query);
 
     // set default values
     this.clientStartTimestamp = -1L;
     this.procTime = 0;  // unused
     this.nbInstructions = 0;  // unused
-
-    // load necessary information into supplementary data structures
-    this.rscList = parseResources(parameters);
   }
 
   public Request(Integer applicationId, String action, String parameters) {
@@ -106,9 +106,9 @@ public class Request {
     this.clientStartTimestamp = -1;
     this.node = 0;
     this.set("cost", r.get("cost"));
-    this.params = r.params;
+    this.query = r.query;
+    this.parameters = r.parameters;
     this.procTime = r.procTime;
-    this.rscList = r.rscList;
     this.serverFinishTimestamp = 0;
     this.action = r.action;
     this.applicationId = r.applicationId;
@@ -271,7 +271,7 @@ public class Request {
   public String toString() {
     return (id
             + ";" + clientStartTimestamp
-            + ";" + params
+            + ";" + query
             + ";" + serverFinishTimestamp
             + ";" + networkDelay
             + ";" + node
@@ -282,7 +282,7 @@ public class Request {
 
   public String display() {
     return (id + ","
-            + params.replaceAll("&|=", ",")
+            + query.replaceAll("&|=", ",")
             + "," + node
             + "," + get("cost"));
   }
@@ -295,35 +295,74 @@ public class Request {
     return this.action;
   }
 
-  public String getParameters() {
-    return this.params;
+  /**
+   * Returns the query string associated with this {@code Request}.
+   * 
+   * @return the query string associated with this {@code Request}
+   */
+  public String getQuery() {
+    return this.query;
   }
 
-  // I don't think this has what I perceived to be the intended behavior.  It
-  // makes it non-overiddable, but it doesn't prevent the list from being
-  // changed.
-  public final List<Integer> getResources() {
-    return this.rscList;
+  /**
+   * Returns a specific parameter from the query string.
+   *
+   * @param key the key of the parameter to return
+   * @return the value, or null if the parameter is not set
+   */
+  public String getParameter(String key) {
+    return this.parameters.get(key);
   }
 
-  public String[] getParamsStr() {
+  /**
+   * Returns the list of resources associated with this {@code Request}.
+   * <p>
+   * This is in place as a convenience method, and it is also in place to
+   * maintain backwards compatibility with older code.  It converts the
+   * "resources" parameter to a list of Integers.  The value of the field should
+   * be a list of Integers separated with underscores.
+   *
+   * @return a {@link List} with the IDs from the "resources" parameter
+   */
+  public List<Integer> getResources() {
+    String value = getParameter("resources");
+    String[] resources = value.split("_");
 
-    String[] tmp = params.split("&|=");
-    String[] result = new String[tmp.length / 2];
-    int y = 0;
-    for (int i = 1; i < tmp.length; i += 2) {
-      result[y++] = tmp[i];
+    List<Integer> result = new LinkedList<>();
+    for (String resource : resources) {
+      result.add(Integer.parseInt(resource));
     }
     return result;
   }
 
-  public int[] getParams() {
-    String[] s = params.split(",");
-    int[] res = new int[s.length];
-    for (int i = 0; i < s.length; i++) {
-      res[i] = Integer.parseInt(s[i]);
+  /**
+   * Parses a standard URL query into a map.
+   * <p>
+   * This allows for the most customization, and it supports all the
+   * functionality already implemented in the examples framework.
+   *
+   * @param query the query string to parse
+   * @return a map with the result, or null if an error occurred
+   */
+  public static Map<String, String> parseQuery(String query) {
+    try {
+      Map<String, String> map = new HashMap<>();
+      String[] parameters = query.split("&");
+      for (String parameter : parameters) {
+        String[] kv = parameter.split("=");
+        String key = URLDecoder.decode(kv[0], "UTF-8");
+        String value = null;
+        if (kv.length > 1) {
+          value = URLDecoder.decode(kv[1], "UTF-8");
+        }
+        map.put(key, value);
+      }
+      return map;
+    } catch (UnsupportedEncodingException ex) {
+      System.err.println("Error parsing query \"" + query + "\": "
+              + ex.getMessage());
+      return null;
     }
-    return res;
   }
 
   public void setNode(int nId) {
@@ -359,18 +398,6 @@ public class Request {
   }
 
   /**
-   *
-   * @param i
-   * @deprecated The ID should be set when the {@code Request} is created.
-   */
-  @Deprecated
-  public void setAppId(int i) {
-    this.applicationId = i;
-  }
-
-  // new type of request for request factory
-
-  /**
    * Only used in Cawa policies (historical) Should be deleted
    *
    * @deprecated
@@ -386,7 +413,7 @@ public class Request {
     this.clientStartTimestamp = artime;
     this.node = node;
     set("cost", cost);
-    this.params = params;
+    this.query = params;
 
   }
 
@@ -394,7 +421,7 @@ public class Request {
   @Deprecated
   public Request(String params) {
     this.id = null;
-    this.params = params;
+    this.query = params;
   }
 
   /** @deprecated @param req @return */
@@ -410,7 +437,7 @@ public class Request {
 
   /** @deprecated @return */
   public Vector requestToVector() {
-    String[] str = this.params.split("&|=");
+    String[] str = this.query.split("&|=");
     double[] d = new double[str.length];
 
     for (int i = 0; i < str.length; i++) {
@@ -422,7 +449,7 @@ public class Request {
 
   /** @deprecated @return */
   public Vector requestToVectorH() {
-    String[] str = this.params.split("&|=");
+    String[] str = this.query.split("&|=");
     double[] d = new double[str.length / 2];
     for (int i = 1; i < str.length; i += 2) {
       if (str[i].matches("^[0-9].*$")) {

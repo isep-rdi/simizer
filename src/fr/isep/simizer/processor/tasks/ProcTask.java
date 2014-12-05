@@ -27,6 +27,10 @@ public class ProcTask extends Task {
   public ProcTask(long instructions, int memorySize) {
     super();
 
+    if (instructions < 0) {
+      throw new IllegalArgumentException("instructions cannot be negative");
+    }
+
     this.totalInstructions = instructions;
     this.remainingInstructions = instructions;
   }

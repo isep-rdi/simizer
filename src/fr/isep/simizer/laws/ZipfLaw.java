@@ -46,14 +46,20 @@ public class ZipfLaw extends Law {
 
     // configure the parameters
     this.skew = skew;
-    setUpperBound(upperBound);
+
+    super.setUpperBound(upperBound);
+    refreshInternalParameters(upperBound);
   }
 
   @Override
-  public final void setUpperBound(int upperBound) {
+  public void setUpperBound(int upperBound) {
     super.setUpperBound(upperBound);
 
-    // we need to recalculate all of the values whenever the upper bound changes
+    // we need to recalculate our parameters whenever the upper bound changes
+    refreshInternalParameters(upperBound);
+  }
+
+  private void refreshInternalParameters(int upperBound) {
     recalculateSum(upperBound);
     recalculateTable(upperBound);
   }

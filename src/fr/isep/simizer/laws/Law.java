@@ -15,8 +15,6 @@ import java.lang.reflect.Constructor;
  */
 public abstract class Law {
 
-  private Integer upperBound = null;
-
   /**
    * Instantiates a {@code Law} subclass from a string representation.
    * <p>
@@ -55,7 +53,7 @@ public abstract class Law {
           } else if (cls.equals(Double.class)) {
             values[index] = Double.parseDouble(args[index + 1]);
           } else {
-            System.exit(1);
+            throw new RuntimeException("Could not parse Law argument.");
           }
           index++;
         }
@@ -71,6 +69,8 @@ public abstract class Law {
 
     return lawInstance;
   }
+
+  private Integer upperBound = null;
 
   /**
    * Initializes an instance of the {@code Law} class.
@@ -112,7 +112,7 @@ public abstract class Law {
    *
    * @return a value from the distribution
    */
-  public final int nextValue() {
+  public int nextValue() {
     int result;
     do {
       result = generateNextValue();

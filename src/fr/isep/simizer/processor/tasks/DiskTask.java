@@ -90,7 +90,7 @@ public class DiskTask extends IOTask {
  * Signals the completion of a disk IO operation.
  */
 class DiskTaskEvent extends Event<DiskTask, DiskTask> {
-  public DiskTaskEvent(long timestamp, DiskTask data, DiskTask target) {
+  protected DiskTaskEvent(long timestamp, DiskTask data, DiskTask target) {
     super(timestamp, data, target);
   }
 

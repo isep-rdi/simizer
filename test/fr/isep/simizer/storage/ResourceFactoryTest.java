@@ -17,7 +17,7 @@ public class ResourceFactoryTest {
 
   @Before
   public void setUp() {
-    factory = new ResourceFactory(10, 0, 32);
+    factory = new ResourceFactory(32, 10);
   }
 
   /**
@@ -87,5 +87,16 @@ public class ResourceFactoryTest {
     // Make sure that all of the resources returned throughout the process are
     // unique.  Do this by adding them to a Set and checking the size.
     Assert.assertEquals("should have 10 unique resources", 10, all.size());
+  }
+
+  /**
+   * The default constructor should not create any initial resources.
+   */
+  @Test
+  public void testDefaultConstructorNoResources() {
+    factory = new ResourceFactory(32);
+
+    Assert.assertEquals("expected no resources",
+            0, factory.getStartList().size());
   }
 }

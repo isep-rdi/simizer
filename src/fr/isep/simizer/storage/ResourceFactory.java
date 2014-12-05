@@ -24,9 +24,6 @@ import java.util.Map;
  */
 public class ResourceFactory {
 
-  /** The maximum number of allowed resources.  Not enforced. */
-  private final int maxRes;
-
   /** The size of each created {@code Resource}. */
   private final int resourceSize;
 
@@ -39,22 +36,30 @@ public class ResourceFactory {
 
   /**
    * Initializes a new factory to create {@code Resource}s.
+   * <p>
+   * Using this constructor creates no resources by default.  To create {@link
+   * Resource}s when creating the factory, use the {@link #ResourceFactory(int,
+   * int)} constructor instead.
    *
+   * @param resourceSize the size of each {@link Resource} created by this
+   *            factory.
+   */
+  public ResourceFactory(int resourceSize) {
+    this(resourceSize, 0);
+  }
+
+  /**
+   * Initializes a new factory to create {@code Resource}s.
+   *
+   * @param resourceSize the size of each {@link Resource} created by this
+   *            factory.
    * @param initialResourceCount the number of resources to initial load into
    *            the factory.  This can be useful when paired with {@link
    *            #getStartList()}, which will return the integer IDs of all the
    *            {@link Resource}s that have already been added.
-   * @param maxRes meant to represent the maximum number of {@link Resource}s
-   *            that can be created, but is currently not enforced.
-   * @param resourceSize the size of each {@link Resource} created by this
-   *            factory.
    */
-  public ResourceFactory(int initialResourceCount, int maxRes,
-        int resourceSize) {
-
-    this.maxRes = maxRes;
+  public ResourceFactory(int resourceSize, int initialResourceCount) {
     this.resourceSize = resourceSize;
-
     createInitialResources(initialResourceCount);
   }
 
@@ -67,10 +72,6 @@ public class ResourceFactory {
     for (int i = 0; i < count; i++) {
       resources.put(i, new Resource(i, resourceSize));
     }
-  }
-
-  public int getMax() {
-    return maxRes;
   }
 
   /**

@@ -68,20 +68,19 @@ public class SimizerUtils {
               for(Object o: array) {
                 JSONObject n = (JSONObject) o;
                 nbInit = ((Number) n.get("nbInit")).intValue();
-                nbMax = ((Number) n.get("nbMax")).intValue();
                 size = ((Number) n.get("size")).intValue();
               }
         } catch (ParseException ex) {
             Logger.getLogger(SimizerUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
-         return new ResourceFactory(nbInit,nbMax,size);
+         return new ResourceFactory(size, nbInit);
      }
      
      private static int DEFAULT_RES_NB = 1024;
      private static int DEFAULT_RES_SZ = 8096;
      
     public static ResourceFactory getDefaultResourceFactory() {
-        return new ResourceFactory(DEFAULT_RES_NB,DEFAULT_RES_NB, DEFAULT_RES_SZ);
+        return new ResourceFactory(DEFAULT_RES_SZ, DEFAULT_RES_NB);
     }
      
   

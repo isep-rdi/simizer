@@ -46,14 +46,8 @@ public class Simulation {
    * Runs the simulation, returning after completion.
    * <p>
    * This method blocks until the {@code Simulation} has finished running.
-   *
-   * @throws Exception if a problem occurs during the {@code Simulation}
    */
-  public void runSim() throws Exception {
-    if (eventChannel == null) {
-      throw new Exception("Event Channel not ready!");
-    }
-
+  public void runSim() {
     for (Node node : nodes.values()) {
       node.start();
     }

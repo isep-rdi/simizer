@@ -60,6 +60,7 @@ public class VM extends Node implements IEventProducer {
    */
   private int activeRequestCount = 0;
 
+  /** The hourly cost of the {@code VM}. */
   protected double hCost = 0.0;
   
   /** The amount of memory (RAM) in use by the {@code Application}s. */
@@ -90,6 +91,17 @@ public class VM extends Node implements IEventProducer {
 
   // TODO: Need to count the active number of requests.
 
+  /**
+   * Initializes a VM with the specified components.
+   * <p>
+   * If the object-based parameters are not specified, default versions of them
+   * will be created.
+   *
+   * @param processor the {@link ProcessingUnit} for this {@code VM} to use
+   * @param disk the {@link StorageElement} that represents the hard disk
+   * @param memory the amount of memory in the system
+   * @param hCost the hourly cost for using the system
+   */
   public VM(ProcessingUnit processor, StorageElement disk, long memory,
       double hCost) {
 
@@ -116,18 +128,41 @@ public class VM extends Node implements IEventProducer {
     this(null, null, DEFAULT_MEMORY_SIZE, DEFAULT_COST);
   }
 
+  /**
+   * Returns the processor for this {@code VM}.
+   * 
+   * @return the processor for this {@code VM}
+   */
   public ProcessingUnit getProcessingUnit() {
     return this.processor;
   }
 
+  /**
+   * Returns the most recent simulation timestamp known to this {@code VM}.
+   *
+   * @return the most recent simulation timestamp known to this {@code VM}
+   */
   public long getClock() {
     return this.clock;
   }
 
+  /**
+   * Returns the hourly cost associated with this {@code VM}.
+   * 
+   * @return the hourly cost associated with this {@code VM}
+   */
   public double getCost() {
     return hCost;
   }
 
+  /**
+   * Returns the number of active {@code Request}s being handled by this system.
+   * <p>
+   * This parameter is useful when implementing certain kinds of load balancing
+   * systems.
+   *
+   * @return the number of active {@code Request}s being handled by this system
+   */
   public int getRequestCount() {
     return activeRequestCount;
   }

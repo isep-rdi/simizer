@@ -29,6 +29,13 @@ public class Simizer {
   static long startTime = 0;
   static long endTime = 0;
 
+  /**
+   * Launches the Simizer executable.
+   * <p>
+   * Currently, the Simizer execute can only be used to generate trace files.
+   *
+   * @param args the command-line arguments
+   */
   public static void main(String[] args) {
     if (args.length >= 1) {
       handleCommand(args[0], Arrays.copyOfRange(args, 1, args.length));
@@ -37,7 +44,7 @@ public class Simizer {
     }
   }
 
-  public static void printUsage(String name) {
+  private static void printUsage(String name) {
     try {
       InputStream stream = ClassLoader.getSystemResourceAsStream(name + ".txt");
 
@@ -111,7 +118,7 @@ public class Simizer {
     }
   }
 
-  static public void generate(String lawConf, String rDescFile, int nbUsers, int maxReq, int interval) {
+  private static void generate(String lawConf, String rDescFile, int nbUsers, int maxReq, int interval) {
 
     Map<String, Law> lawMap = loadLaws(lawConf);
     RequestFactory rf = new RequestFactory();
@@ -181,7 +188,7 @@ public class Simizer {
 
   private static void clientSim(String[] args) {}
 
-  static public Map<String, Law> loadLaws(String lawConfFile) {
+  private static Map<String, Law> loadLaws(String lawConfFile) {
     Properties p = new Properties();
     Map<String, Law> lawMap = new HashMap<String, Law>();
     try {

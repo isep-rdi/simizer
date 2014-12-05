@@ -43,12 +43,12 @@ public class Simulation {
   }
 
   /**
-   * Loads entities from the specified configuration file.
+   * Runs the simulation, returning after completion.
+   * <p>
+   * This method blocks until the {@code Simulation} has finished running.
    *
-   * @param nodeFilePath
+   * @throws Exception if a problem occurs during the {@code Simulation}
    */
-  public void setupSimEntities(String nodeFilePath) {}
-
   public void runSim() throws Exception {
     if (eventChannel == null) {
       throw new Exception("Event Channel not ready!");
@@ -62,12 +62,28 @@ public class Simulation {
     ed.run();
   }
 
+  /**
+   * Adds the specified {@code Network}.
+   * <p>
+   * {@link Network}s will not be added twice, so it is fine to call this method
+   * multiple times with the same {@link Network}.
+   *
+   * @param network the {@link Network} to add to the {@code Simulation}
+   */
   public void addNetwork(Network network) {
     if (networks.add(network)) {
       network.setChannel(eventChannel);
     }
   }
 
+  /**
+   * Adds the specified {@code Node}.
+   * <p>
+   * {@link Node}s will not be added twice, so it is fine to call this method
+   * multiple times with the same {@link Node}.
+   *
+   * @param node the {@link Node} to add
+   */
   public void addNode(Node node) {
     int id = node.getId();
     if (!nodes.containsKey(id)) {
@@ -99,6 +115,15 @@ public class Simulation {
     node.setNetwork(network);
   }
 
+  /**
+   * Adds the specified {@code Node}s to the {@code Network}.
+   * <p>
+   * This method calls {@link #toNetworkAddNode(Network, Node)} with each of the
+   * specified {@link Node}s.
+   *
+   * @param network the {@link Network} where the {@link Node}s should be added
+   * @param nodes a list of {@link Node}s to add to the {@code Simulation}
+   */
   public void toNetworkAddNodes(Network network, Node ... nodes) {
     for (Node node : nodes) {
       toNetworkAddNode(network, node);

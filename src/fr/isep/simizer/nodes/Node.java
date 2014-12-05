@@ -25,6 +25,7 @@ public abstract class Node implements MessageReceiver {
   /** The {@code Network} associated with this {@code Node}. */
   private Network network = null;
 
+  /** The most recent timestamp of the simulation known to this {@code Node}. */
   protected long clock;
 
   /**

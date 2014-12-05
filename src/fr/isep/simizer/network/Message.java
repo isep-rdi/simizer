@@ -22,6 +22,13 @@ public class Message {
   /** The request contained in the {@code Message}. */
   private final Request request;
 
+  /**
+   * Initializes a new instance of the {@code Message} class.
+   *
+   * @param origin the sender of the {@code Message}
+   * @param destination the recipient of the {@code Message}
+   * @param request the {@link Request} being sent
+   */
   public Message(Node origin, MessageReceiver destination, Request request) {
     this.origin = origin;
     this.destination = destination;

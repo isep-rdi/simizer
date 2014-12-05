@@ -28,6 +28,22 @@ public class ClientGenerator {
   
   private int maxUsers = 0;
 
+  /**
+   * Initializes a new {@code ClientGenerator}.
+   * <p>
+   * Creates a new {@link ClientGenerator} that is ready to spawn clients.
+   *
+   * @param simulation the {@link Simulation} where the clients should be added
+   * @param network the {@link Network} that the clients should use
+   * @param arrivalLaw the {@link Law} describing the number of clients that
+   *            arrive every {@code interval} milliseconds
+   * @param interval the number of milliseconds between the timestamps when
+   *            clients arrive
+   * @param frontend the {@link Node} that the clients should use as their
+   *            service address
+   * @param maxUsers the maximum number of users that this generator should
+   *            spawn
+   */
   public ClientGenerator(Simulation simulation, Network network, Law arrivalLaw,
       int interval, Node frontend, int maxUsers) {
 

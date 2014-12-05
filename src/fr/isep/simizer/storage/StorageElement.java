@@ -24,16 +24,6 @@ public class StorageElement {
   /** The size of a terabyte. */
   public static final long TERABYTE = KILOBYTE * GIGABYTE;
 
-  protected static ResourceFactory resourceFact;
-
-  public static void setFactory(ResourceFactory rf) {
-    resourceFact = rf;
-  }
-
-  public static ResourceFactory getFactory() {
-    return resourceFact;
-  }
-
   /** The amount of space currently used. */
   protected long used = 0;
 
@@ -152,19 +142,6 @@ public class StorageElement {
     }
 
     return true;  // getting this far means that we could change the resource
-  }
-
-  /**
-   * Writes {@code ResourceFactory}-generated resources with the specified IDs.
-   *
-   * @param resources the IDs of the resources that should be saved.  The
-   *            resources will be created using the shared static {@link
-   *            ResourceFactory} (using {@link #getFactory()}).
-   */
-  public void write(List<Integer> resources) {
-    for (Integer resourceId : resources) {
-      write(getFactory().getResource(resourceId));
-    }
   }
 
   /**

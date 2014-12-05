@@ -37,7 +37,7 @@ public class DiskTask extends IOTask {
    * @param resource the actual resource being modified
    * @param type the type of action that should be taken with the resource
    */
-  public DiskTask(VM vm, int size, Resource resource, IOType type) {
+  public DiskTask(VM vm, long size, Resource resource, IOType type) {
     super(size);
 
     this.vm = vm;

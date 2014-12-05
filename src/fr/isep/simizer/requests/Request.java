@@ -57,9 +57,6 @@ public class Request {
   /** The number of errors that have occurred for this {@code Request}. */
   private int errorCount = 0;
 
-  /** The size of the {@code Request}.  This value is mostly ignored. */
-  private int size;
-
   /**
    * Performs internal initialization of the {@code Request}.
    * <p>
@@ -256,15 +253,6 @@ public class Request {
    */
   public void reportErrors(int count) {
     this.errorCount += count;
-  }
-
-  /**
-   * Returns the size of the {@code Request}.
-   *
-   * @return the size of the {@code Request}
-   */
-  public int getSize() {
-    return this.size;
   }
 
   @Override

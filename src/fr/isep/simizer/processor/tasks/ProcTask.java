@@ -24,7 +24,7 @@ public class ProcTask extends Task {
    * @param instructions the number of instructions needed to execute the task
    * @param memorySize the memory footprint of the task (unused)
    */
-  public ProcTask(long instructions, int memorySize) {
+  public ProcTask(long instructions, long memorySize) {
     super();
 
     if (instructions < 0) {

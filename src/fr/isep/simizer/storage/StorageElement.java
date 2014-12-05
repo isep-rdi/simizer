@@ -213,7 +213,7 @@ public class StorageElement {
     return this.storage.values();
   }
 
-  private static long computeDelay(double mbDelay, long seekDelay, int size) {
+  private static long computeDelay(double mbDelay, long seekDelay, long size) {
     return Math.round((size * 1.0 / MEGABYTE) * mbDelay) + seekDelay;
   }
 
@@ -226,7 +226,7 @@ public class StorageElement {
     }
   }
 
-  public long getReadDelay(int id, int size) {
+  public long getReadDelay(int id, long size) {
     if (storage.containsKey(id)) {
       return computeDelay(perMBReadDelay, delay, size);
     } else {
@@ -234,7 +234,7 @@ public class StorageElement {
     }
   }
 
-  public long getWriteDelay(int id, int size) {
+  public long getWriteDelay(int id, long size) {
     return computeDelay(perMBWriteDelay, delay, size);
   }
 

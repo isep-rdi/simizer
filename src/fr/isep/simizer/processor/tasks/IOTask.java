@@ -11,14 +11,14 @@ package fr.isep.simizer.processor.tasks;
 public abstract class IOTask extends Task {
 
   /** The size of the operation. */
-  private final int size;
+  private final long size;
 
   /**
    * Initializes a new task with the specified size.
    *
    * @param size the size of the operation
    */
-  public IOTask(int size) {
+  public IOTask(long size) {
     super();
 
     this.size = size;
@@ -29,7 +29,7 @@ public abstract class IOTask extends Task {
    *
    * @return the size of the IO operation
    */
-  public int getSize() {
+  public long getSize() {
     return size;
   }
 

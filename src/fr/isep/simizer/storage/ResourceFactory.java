@@ -25,7 +25,7 @@ import java.util.Map;
 public class ResourceFactory {
 
   /** The size of each created {@code Resource}. */
-  private final int resourceSize;
+  private final long resourceSize;
 
   /**
    * Stores the {@code Resource} objects that have been created.
@@ -44,7 +44,7 @@ public class ResourceFactory {
    * @param resourceSize the size of each {@link Resource} created by this
    *            factory.
    */
-  public ResourceFactory(int resourceSize) {
+  public ResourceFactory(long resourceSize) {
     this(resourceSize, 0);
   }
 
@@ -58,7 +58,7 @@ public class ResourceFactory {
    *            #getStartList()}, which will return the integer IDs of all the
    *            {@link Resource}s that have already been added.
    */
-  public ResourceFactory(int resourceSize, int initialResourceCount) {
+  public ResourceFactory(long resourceSize, int initialResourceCount) {
     this.resourceSize = resourceSize;
     createInitialResources(initialResourceCount);
   }
@@ -79,7 +79,7 @@ public class ResourceFactory {
    *
    * @return the size of each {@code Resource} created by this factory
    */
-  public int getResourceSize() {
+  public long getResourceSize() {
     return resourceSize;
   }
 

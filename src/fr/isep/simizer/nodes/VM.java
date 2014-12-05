@@ -386,7 +386,7 @@ public class VM extends Node implements IEventProducer {
     * @return the {@link Resource} if the operation is successful, null if it
     *         fails
     */
-    public Resource read(Integer resourceId, int size) {
+    public Resource read(Integer resourceId, long size) {
       Resource res = disk.read(resourceId);
       if (res != null) {
         session.addTask(new DiskTask(VM.this, size, res, IOType.READ));
@@ -406,7 +406,7 @@ public class VM extends Node implements IEventProducer {
     public Resource read(Integer resourceId) {
      Resource res = disk.read(resourceId);
      if (res != null) {
-       return read(resourceId, (int) res.size());
+       return read(resourceId, res.size());
      } else {
        return null;
      }
@@ -421,7 +421,7 @@ public class VM extends Node implements IEventProducer {
      * @param size
      * @return 0 if created, -1 if failure to write (eg. not enough space).
      */
-    public int write(Resource resource, int size) {
+    public int write(Resource resource, long size) {
       if (disk.getUsedSpace() + size > disk.getCapacity()) {
         return -1;
       }
@@ -438,11 +438,11 @@ public class VM extends Node implements IEventProducer {
      * @return the version number of the resource (this will be 0 if it was just
      *         created), or -1 to indicate some sort of failure
      */
-    public int modify(Integer resourceId, int size) {
+    public int modify(Integer resourceId, long size) {
       if (!disk.contains(resourceId)) {
         return -1;
       }
-      Resource res = disk.read(size);
+      Resource res = disk.read(resourceId);
       if (disk.getUsedSpace() + (size - res.size()) > disk.getCapacity()) {
         return -1;
       }
@@ -462,7 +462,7 @@ public class VM extends Node implements IEventProducer {
      *            {@link ProcTask}
      * @return zero, always
      */
-    public int execute(long nbInstructions, int memSize, List<Resource> resources) {
+    public int execute(long nbInstructions, long memSize, List<Resource> resources) {
       session.addTask(new ProcTask(nbInstructions, memSize));
       return 0;
     }

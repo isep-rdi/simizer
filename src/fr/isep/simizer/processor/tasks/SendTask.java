@@ -17,7 +17,7 @@ import fr.isep.simizer.requests.Request;
  *
  * @author Sylvain Lefebvre
  */
-public class SendTask extends IOTask {
+public class SendTask extends Task {
 
   private final Request request;
   private final Node destination;
@@ -35,7 +35,7 @@ public class SendTask extends IOTask {
    * @param vm the {@link VM} from which the {@link Request} is sent
    */
   public SendTask(Request request, Node destination, VM vm) {
-    super(request.getSize());
+    super();
 
     this.request = request;
     this.destination = destination;

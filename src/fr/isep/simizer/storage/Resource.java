@@ -47,7 +47,7 @@ public class Resource {
    * @param resourceId the ID to use for the {@code Resource}
    * @param size the size of the {@code Resource}
    */
-  public Resource(Integer resourceId, int size) {
+  public Resource(Integer resourceId, long size) {
     this.id = resourceId;
     this.size = size;
   }

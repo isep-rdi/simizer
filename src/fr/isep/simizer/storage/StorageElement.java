@@ -119,7 +119,7 @@ public class StorageElement {
    * @return the {@link Resource}, or null if this storage does not contain a
    *             {@link Resource} with that ID
    */
-  public Resource read(int resourceId) {
+  public Resource read(Integer resourceId) {
     return storage.get(resourceId);
   }
 
@@ -184,7 +184,7 @@ public class StorageElement {
    * @return true if this storage contains the {@link Resource}, false if it
    *             does not
    */
-  public boolean contains(int resourceId) {
+  public boolean contains(Integer resourceId) {
     return storage.containsKey(resourceId);
   }
 
@@ -217,9 +217,9 @@ public class StorageElement {
     return Math.round((size * 1.0 / MEGABYTE) * mbDelay) + seekDelay;
   }
 
-  public long getDelay(Integer ressourceId) {
-    if (storage.containsKey(ressourceId)) {
-      long rDelay = Math.round((storage.get(ressourceId).size() / MEGABYTE) * perMBReadDelay);
+  public long getDelay(Integer resourceId) {
+    if (storage.containsKey(resourceId)) {
+      long rDelay = Math.round((storage.get(resourceId).size() / MEGABYTE) * perMBReadDelay);
       return rDelay + delay; //disk_seek
     } else {
       return delay;

@@ -6,6 +6,7 @@ import fr.isep.simizer.laws.Law;
 import fr.isep.simizer.nodes.ClientNode;
 import fr.isep.simizer.nodes.Node;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -14,6 +15,8 @@ import java.util.List;
  * The {@code ClientGenerator} is useful for automatically creating clients in
  * the simulation.  It will generate clients according to a probability
  * distribution at a set interval.
+ * <p>
+ * It also has the ability to limit the number of simultaneous clients.
  * 
  * @author slefebvr for ISEP
  */
@@ -28,6 +31,8 @@ public class ClientGenerator {
   
   private int maxUsers = 0;
 
+  private final List<ClientNode> activeClients = new LinkedList<>();
+
   /**
    * Initializes a new {@code ClientGenerator}.
    * <p>
@@ -41,8 +46,14 @@ public class ClientGenerator {
    *            clients arrive
    * @param frontend the {@link Node} that the clients should use as their
    *            service address
-   * @param maxUsers the maximum number of users that this generator should
-   *            spawn
+   * @param maxUsers the maximum number of <strong>simultaneous</strong> clients
+   *            that this generator will have spawned at any point in time.
+   *            Once a client has finished, the generator will be able to create
+   *            another in its place.  However, if this parameter prevents a
+   *            client from being created at some point, the generator will
+   *            <strong>not</strong> automatically go back to spawn a client
+   *            when a space opens up.  Having a space open up simply means that
+   *            another client <em>could</em> be created in the future.
    */
   public ClientGenerator(Simulation simulation, Network network, Law arrivalLaw,
       int interval, Node frontend, int maxUsers) {
@@ -79,16 +90,21 @@ public class ClientGenerator {
    * @param event the event that occurred
    */
   public void onArrivalEvent(long timestamp, ArrivalEvent event) {
-
     long nodesToCreate = event.getData();
 
-    List<Node> nodeList = network.getNodeList();
+    // Remove any finished ClientNode instances
+    // This will let us create new ones.
+    Iterator<ClientNode> iterator = activeClients.iterator();
+    while (iterator.hasNext()) {
+      if (iterator.next().getEnded()) {
+        iterator.remove();
+      }
+    }
 
-    // reuse any that are possible
-    nodesToCreate = reinitNodes(nodeList, nodesToCreate, timestamp);
-
-    // make sure that we don't exceed maxUsers
-    nodesToCreate = Math.min(maxUsers - nodeList.size(), nodesToCreate);
+    // Now that we have cleared out any finished clients, let's create new
+    // ClientNode objects, making sure that we don't pass the maximum allowed
+    // number of simultaneous clients.
+    nodesToCreate = Math.min(maxUsers - activeClients.size(), nodesToCreate);
 
     while (nodesToCreate > 0) {
       createNode(timestamp);
@@ -96,37 +112,6 @@ public class ClientGenerator {
     }
 
     scheduleNextArrival(timestamp + interval);
-  }
-
-  /**
-   * Reinitializes finished nodes to save memory.
-   * <p>
-   * This will reinitialize up to {@code number} nodes, and it will return the
-   * number that still need to be initialized.  (This is in place so that the
-   * calling code can create new instances for the remaining nodes.)
-   * 
-   * @param nodes the nodes that we should try to reuse
-   * @param number the number of nodes to create
-   * @param timestamp the current timestamp of the simulation
-   * @return the number of nodes that still need to be initialized
-   */
-  private long reinitNodes(List<Node> nodes, long number, final long timestamp) {
-    Iterator<Node> iterator = nodes.iterator();
-
-    while (iterator.hasNext() && number > 0) {
-      Node node = iterator.next();
-      if (!(node instanceof ClientNode)) {
-        continue;
-      }
-      ClientNode client = (ClientNode) node;
-
-      if (client.getEnded()) {
-        client.reinit(timestamp);
-        number--;
-      }
-    }
-
-    return number;
   }
 
   /**
@@ -138,6 +123,7 @@ public class ClientGenerator {
     ClientNode client = new ClientNode(timestamp);
     client.setServiceAddress(frontend);
     simulation.toNetworkAddNode(network, client);
+    activeClients.add(client);
     client.start();
   }
 

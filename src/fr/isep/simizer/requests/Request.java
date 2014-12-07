@@ -4,12 +4,19 @@ import fr.isep.simizer.network.Network;
 import fr.isep.simizer.utils.Vector;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Represents a request (and later response) that is sent during the simulation.
+ * <p>
+ * There basic format for requests is that they are defined by three non-mutable
+ * parameters: application, action, and query.  The application can be thought
+ * of as the hostname in a URL.  The action is the path component.  And the
+ * query is the part after the "?" in the URL.
+ */
 public class Request {
 
   /** The next ID that should be assigned to a {@code Requst}. */
@@ -28,6 +35,8 @@ public class Request {
 
   /** The query string to pass to the handler. */
   protected String query;
+
+  /** The parsed parameters from the query string. */
   protected Map<String, String> parameters = null;
 
   private long nbInstructions;  // @deprecated
@@ -71,6 +80,17 @@ public class Request {
     }
   }
 
+  /**
+   * Initializes a new {@code Request}.
+   *
+   * @param applicationId the ID of the {@link Application} where the {@code
+   *            Request} should be sent
+   * @param action the action that the server should perform for this {@code
+   *            Request}
+   * @param query the additional parameters that define how the action should be
+   *            taken
+   * @param isTemplate whether or not this is a {@code Request} template
+   */
   public Request(Integer applicationId, String action, String query,
       boolean isTemplate) {
 
@@ -88,6 +108,16 @@ public class Request {
     this.nbInstructions = 0;  // unused
   }
 
+  /**
+   * Initializes a {@code Request} that is <strong>not</strong> a template.
+   *
+   * @param applicationId the ID of the {@link Application} where the {@code
+   *            Request} should be sent
+   * @param action the action that the server should perform for this {@code
+   *            Request}
+   * @param query the additional parameters that define how the action should be
+   *            taken
+   */
   public Request(Integer applicationId, String action, String parameters) {
     this(applicationId, action, parameters, false);
   }
@@ -114,6 +144,11 @@ public class Request {
     this.nbInstructions = r.nbInstructions;
   }
 
+  /**
+   * Returns the ID of the {@code Request}.
+   *
+   * @return the ID of the {@code Request}
+   */
   public Long getId() {
     return this.id;
   }
@@ -268,6 +303,7 @@ public class Request {
             + ";" + errorCount + "r");
   }
 
+  /** @deprecated @return */
   public String display() {
     return (id + ","
             + query.replaceAll("&|=", ",")
@@ -275,10 +311,20 @@ public class Request {
             + "," + get("cost"));
   }
 
+  /**
+   * Returns the {@code Application} ID associated with this {@code Request}.
+   *
+   * @return the {@code Application} ID associated with this {@code Request}
+   */
   public Integer getApplicationId() {
     return this.applicationId;
   }
 
+  /**
+   * Returns the action associated with this {@code Request}.
+   *
+   * @return the action associated with this {@code Request}
+   */
   public String getAction() {
     return this.action;
   }
@@ -353,25 +399,27 @@ public class Request {
     }
   }
 
+  /** @deprecated @param nId */
   public void setNode(int nId) {
     this.node = nId;
   }
 
-  /** @deprecated */
+  /** @deprecated @return */
   public long getProcTime() {
     return this.procTime;
   }
 
+  /** @deprecated @return */
   public Integer getNodeId() {
     return this.node;
   }
 
-  /** @deprecated */
+  /** @deprecated @return */
   public long getNbInst() {
     return this.nbInstructions;
   }
 
-  /** @deprecated */
+  /** @deprecated @param l */
   public void setNbInst(long l) {
     this.nbInstructions = l;
   }

@@ -137,7 +137,7 @@ public class Resource {
     this.lock = false;
   }
 
-  /** @deprecated */
+  /** @deprecated @param aliveTime */
   public void setAliveTime(long aliveTime) {
     // this.aliveTime = aliveTime;
   }

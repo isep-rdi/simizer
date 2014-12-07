@@ -82,7 +82,6 @@ public class ProcessingUnit extends TaskProcessor {
     super.endTask(task, timestamp);
   }
 
-  @Override
   public void onProcTaskEnded(long timestamp, ProcTask task) {
     task.finish(timestamp);
   }

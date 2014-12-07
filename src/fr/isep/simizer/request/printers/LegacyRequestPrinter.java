@@ -11,6 +11,11 @@ import java.io.PrintStream;
  * @author Max Radermacher
  */
 public class LegacyRequestPrinter extends RequestPrinter {
+  /**
+   * Initializes the legacy printer.
+   *
+   * @param output where the {@link RequestPrinter} should send its output
+   */
   public LegacyRequestPrinter(PrintStream output) {
     super(output);
   }

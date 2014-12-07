@@ -9,7 +9,12 @@ import fr.isep.simizer.processor.tasks.DiskTask;
  * action that should occur.
  */
 public enum IOType {
+  /** Represents an IO action that reads data. */
   READ,
+
+  /** Represents and IO action that writes data. */
   WRITE,
+
+  /** Represents an IO action that modifies data. */
   MODIFY,
 }

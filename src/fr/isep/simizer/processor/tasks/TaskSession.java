@@ -29,8 +29,15 @@ public class TaskSession {
   private final int sessionId;
   private final List<Integer> resList = new ArrayList<>();
 
-  public TaskSession(int sesId) {
-    this.sessionId = sesId;
+  /**
+   * Initializes a new {@code TaskSession} with the specified ID.
+   * <p>
+   * Currently, the parameter is ignored.
+   *
+   * @param sessionId the session ID parameter.  Unused.
+   */
+  public TaskSession(int sessionId) {
+    this.sessionId = sessionId;
   }
 
   /**
@@ -81,7 +88,7 @@ public class TaskSession {
     return (tasks.size() == 0);
   }
 
-  /** @deprecated */
+  /** @deprecated @return */
   public int getSessionId() {
     return this.sessionId;
   }
@@ -97,17 +104,17 @@ public class TaskSession {
     return getRemainingTaskCount();
   }
 
-  /** @deprecated */
+  /** @deprecated @param rId */
   public void addResource(Integer rId) {
     resList.add(rId);
   }
 
-  /** @deprecated */
+  /** @deprecated @return */
   public List<Integer> getResourceList() {
     return this.resList;
   }
 
-  /** @deprecated */
+  /** @deprecated @return */
   public Task getCurrentTask() {
     return this.currentTask;
   }

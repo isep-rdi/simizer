@@ -28,6 +28,12 @@ public class Cache extends StorageElement {
    */
   private final LinkedList<Integer> cachedResources = new LinkedList<>();
 
+  /**
+   * Initializes a new {@code Cache} object.
+   *
+   * @param capacity the storage capacity of the cache
+   * @param accessDelay the constant-time delay when interacting with the cache
+   */
   public Cache(long capacity, long accessDelay) {
     super(capacity, accessDelay);
 

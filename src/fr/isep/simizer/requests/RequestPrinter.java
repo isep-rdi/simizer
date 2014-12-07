@@ -9,8 +9,14 @@ import java.io.PrintStream;
  * @author Max Radermacher
  */
 public abstract class RequestPrinter {
+  /** The {@code PrintStream} where the requests should be printed. */
   protected final PrintStream output;
 
+  /**
+   * Initializes a new instance.
+   *
+   * @param output the {@link PrintStream} where the requests should be printed
+   */
   public RequestPrinter(PrintStream output) {
     this.output = output;
   }

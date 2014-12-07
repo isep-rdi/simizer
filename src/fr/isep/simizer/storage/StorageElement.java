@@ -42,6 +42,13 @@ public class StorageElement {
   /** The resources contained in this {@code StorageElement}. */
   protected final Map<Integer, Resource> storage;
 
+  /**
+   * Initializes a new instance.
+   *
+   * @param capacity the storage capacity
+   * @param accessDelay the constant-time delay when interacting with the
+   *            storage
+   */
   public StorageElement(long capacity, long accessDelay) {
     this.capacity = capacity;
     this.delay = accessDelay;
@@ -238,7 +245,7 @@ public class StorageElement {
     return computeDelay(perMBWriteDelay, delay, size);
   }
 
-  /** @deprecated */
+  /** @deprecated @param resources @return */
   public boolean isUnlocked(List<Integer> resources) {
     for (Integer id : resources) {
       if (contains(id)) {
@@ -251,14 +258,14 @@ public class StorageElement {
     return true;
   }
 
-  /** @deprecated */
+  /** @deprecated @param ressources @param aliveTime */
   public void Nwrite(List<Integer> ressources, long aliveTime) {
     for (Integer r : ressources) {
       Nwrite(r, aliveTime);
     }
   }
 
-  /** @deprecated */
+  /** @deprecated @param r @param aliveTime */
   public void Nwrite(Integer r, long aliveTime) {
     //checks wether it is a modification rather than a new file
     if (storage.containsKey(r)) {

@@ -2,13 +2,18 @@ package fr.isep.simizer.processor;
 
 import fr.isep.simizer.event.Event;
 import fr.isep.simizer.event.EventProducer;
-import fr.isep.simizer.processor.tasks.ProcTask;
 import fr.isep.simizer.processor.tasks.Task;
 import fr.isep.simizer.processor.tasks.TaskSession;
 
+/**
+ * Responsible for handling the execution of {@code TaskSession} objects.
+ * <p>
+ * Subclasses may override certain functionality to more accurately simulate the
+ * execution of various kinds of {@link Task} objects, but the purpose of this
+ * class is to handle the starting/stopping/finishing of {@link TaskSession}
+ * objects.
+ */
 public abstract class TaskProcessor extends EventProducer {
-
-  public abstract void onProcTaskEnded(long timestamp, ProcTask pt);
 
   /**
    * Schedules the next {@code Task} to be run immediately.

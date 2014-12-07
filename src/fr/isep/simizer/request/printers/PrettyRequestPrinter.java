@@ -16,13 +16,21 @@ public class PrettyRequestPrinter extends RequestPrinter {
 
   private boolean didPrintHeader = false;
 
+  /**
+   * Initializes the pretty printer.
+   *
+   * @param output where the {@link RequestPrinter} should send its output
+   */
   public PrettyRequestPrinter(PrintStream output) {
     super(output);
   }
 
-  // Start, Total Roundtrip Time, Network Delay
-    // App, Action, Parameters
-
+  /**
+   * Prints the header row for the output.
+   * <p>
+   * This method is automatically called by the "print" method just before the
+   * first line of output is produced.
+   */
   protected void printHeader() {
     output.format(ENTRY_FORMAT.replace('d', 's'),
         "Request",

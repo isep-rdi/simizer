@@ -318,10 +318,25 @@ public class VM extends Node implements IEventProducer {
     }
   }
 
+  /**
+   * Called when a {@code SendTask} is finished.
+   * <p>
+   * This provides an opportunity for the {@code VM} to perform any necessary
+   * cleanup.
+   *
+   * @param task the {@link DiskTask} that was just finished
+   */
   public void commitSendTask(SendTask task) {
-    
+    // TODO: Decrement the number of active requests.
   }
 
+  /**
+   * Returns the maximum expected number of resources simultaneously in memory.
+   *
+   * @return the maximum expected number of resources simultaneously in memory.
+   *         That is to say that, given the size of the current resources, we
+   *         expect to be able to store this number.
+   */
   public int getMaximumActiveRequestsCount() {
     long size = 0;
     long count = 0;
@@ -365,6 +380,10 @@ public class VM extends Node implements IEventProducer {
    */
   public class TaskScheduler {
     private final TaskSession session;
+
+    /**
+     * Initializes an instance of {@code TaskScheduler} for this {@code VM}.
+     */
     public TaskScheduler() {
       this.session = new TaskSession(0);
     }
@@ -373,6 +392,11 @@ public class VM extends Node implements IEventProducer {
       return session;
     }
 
+    /**
+     * Returns the {@code VM} for this {@code TaskScheduler}.
+     *
+     * @return the {@code VM} for this {@code TaskScheduler}
+     */
     public VM getVM() {
       return VM.this;
     }

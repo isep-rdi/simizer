@@ -25,7 +25,7 @@ public class ProcessingUnit extends TaskProcessor {
 
   private static final int DEF_EPOCH_GRAN = 4; //ms
   private static final int EPOCH_THRESOLD = 20; //ms
-  private static final long MILLION = 1000 * 1000;
+  private static final long MILLION = 1_000_000;
   private VM vmInstance = null;
 
   private long lastEpoch = 0;

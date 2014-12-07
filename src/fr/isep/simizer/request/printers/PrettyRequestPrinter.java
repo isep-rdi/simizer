@@ -11,10 +11,10 @@ import java.io.PrintStream;
  * @author Max Radermacher
  */
 public class PrettyRequestPrinter extends RequestPrinter {
-  private boolean didPrintHeader = false;
-
   private static final String ENTRY_FORMAT
       = "%7d %6d %6d  %9d %9d %9d  %3d %s;%s%n";
+
+  private boolean didPrintHeader = false;
 
   public PrettyRequestPrinter(PrintStream output) {
     super(output);

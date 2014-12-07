@@ -83,8 +83,7 @@ public class VM extends Node implements IEventProducer {
   /** The temporary but faster {@code Cache} for this {@code VM}. */
   private Cache cache;
 
-  private Map<Integer, Application> idToApp = new HashMap<>();
-  private TaskSession currentTaskSession = null;
+  private final Map<Integer, Application> idToApp = new HashMap<>();
 
   /** Whether or not the {@code VM} has been started. */
   private boolean started = false;
@@ -109,7 +108,7 @@ public class VM extends Node implements IEventProducer {
 
     this.processor = (processor != null)
             ? processor
-            : new ProcessingUnit(1, 1000, null);
+            : new ProcessingUnit(1, 1_000, null);
     this.disk = (disk != null)
             ? disk
             : new StorageElement(1_000_000, 10);

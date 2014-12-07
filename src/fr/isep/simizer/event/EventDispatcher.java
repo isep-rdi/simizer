@@ -13,6 +13,9 @@ import java.util.logging.Logger;
  */
 public class EventDispatcher implements Runnable {
 
+  /** The maximum amount of time to wait for events before finishing. */
+  private static final long WAIT_TIME = 100;
+
   /** Whether or not the run loop has been canceled. */
   private boolean canceled = false;
 
@@ -28,11 +31,7 @@ public class EventDispatcher implements Runnable {
   private int eventCount = 0;
 
   /** The {@code Channel} for which events will be delivered. */
-  private final Channel channel;
-
-  /** The maximum amount of time to wait for events before finishing. */
-  private static final long WAIT_TIME = 100;
-  
+  private final Channel channel;  
 
   /**
    * Initializes a new instance of the class.

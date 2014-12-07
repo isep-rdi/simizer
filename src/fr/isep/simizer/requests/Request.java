@@ -362,15 +362,6 @@ public class Request {
     return this.procTime;
   }
 
-  private static List<Integer> parseResources(String params) {
-    List<Integer> rList = new ArrayList<>();
-    String[] tokens = params.split("&|=");
-    for (int i = 1; i < tokens.length; i += 2) {
-      rList.add(Integer.parseInt(tokens[i]));
-    }
-    return rList;
-  }
-
   public Integer getNodeId() {
     return this.node;
   }

@@ -70,7 +70,7 @@ public abstract class TaskProcessor extends EventProducer {
  * Runs the specified {@code Task} on a {@code TaskProcessor}.
  */
 class RunTaskEvent extends Event<Task, TaskProcessor> {
-  public RunTaskEvent(long timestamp, Task data, TaskProcessor target) {
+  protected RunTaskEvent(long timestamp, Task data, TaskProcessor target) {
     super(timestamp, data, target);
   }
 

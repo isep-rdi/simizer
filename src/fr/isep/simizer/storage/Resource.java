@@ -13,7 +13,7 @@ package fr.isep.simizer.storage;
 public class Resource {
 
   /** The default size of {@code Resource}s. */
-  public static final int DEFAULT_SIZE = 1024;
+  public static final long DEFAULT_SIZE = StorageElement.KILOBYTE;
 
   /** The ID of the {@code Resource}. */
   private final Integer id;

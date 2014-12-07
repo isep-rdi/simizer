@@ -4,8 +4,6 @@ import fr.isep.simizer.nodes.Node;
 import fr.isep.simizer.nodes.VM;
 import fr.isep.simizer.nodes.VM.TaskScheduler;
 import fr.isep.simizer.requests.Request;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -24,20 +22,8 @@ public abstract class Application {
   /** The amount of memory used by this {@code Application}. */
   private final long memorySize;
 
-  /**
-   * The {@code VM} on which this {@code Application} is being run.
-   * <p>
-   * This reference can be used to allow the {@code Application} to make "system
-   * calls," such as file operations, network operations, and processor
-   * execution operations.
-   */
-  protected VM vm;
-
   /** Contains user-specific properties for the {@code Application}. */
   protected Properties config = new Properties();
-
-  /** Holds a reference to all of the pending requests. */
-  private final Map<Long, Node> pending = new HashMap<>();
 
   /**
    * Initializes a new instance of the class.
@@ -66,7 +52,6 @@ public abstract class Application {
     this.memorySize = template.memorySize;
     // TODO: I don't think we want to copy this as a reference.
     this.config = template.config;
-    this.vm = null;
   }
 
   /**
@@ -85,15 +70,6 @@ public abstract class Application {
    */
   public long getMemorySize() {
     return memorySize;
-  }
-
-  /**
-   * Sets the {@code VM} associated with this {@code Application}.
-   *
-   * @param vm the {@code VM} to associate with this {@code Application}
-   */
-  public void setVM(VM vm) {
-    this.vm = vm;
   }
 
   /**

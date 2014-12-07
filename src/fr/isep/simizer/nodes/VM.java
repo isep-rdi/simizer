@@ -177,7 +177,6 @@ public class VM extends Node implements IEventProducer {
    * @param application the {@link Application} to deploy
    */
   public void deploy(Application application) {
-    application.setVM(this);
     idToApp.put(application.getId(), application);
     memoryUsed += application.getMemorySize();
     if (started) {
@@ -373,6 +372,10 @@ public class VM extends Node implements IEventProducer {
 
     private TaskSession getTaskSession() {
       return session;
+    }
+
+    public VM getVM() {
+      return VM.this;
     }
 
     /**

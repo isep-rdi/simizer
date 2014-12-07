@@ -55,15 +55,16 @@ public class Resource {
   /**
    * Creates a {@code Resource} by copying the contents of another.
    * <p>
-   * Please be aware that this constructor will still set the {@code version} of
-   * the new resource to zero.  (This may or may not be the desired behavior,
-   * but it is the way that it works.)
+   * Internally, the storage elements do not return references to the internal
+   * resources.  This prevents the application logic from changing the version
+   * that is "stored on the disk."
    *
    * @param resource the {@code Resource} to copy
    */
   public Resource(Resource resource) {
     this.id = resource.id;
     this.size = resource.size;
+    this.version = resource.version;
   }
 
   /**
@@ -82,6 +83,15 @@ public class Resource {
    */
   public long size() {
     return size;
+  }
+
+  /**
+   * Sets the size of the {@code Resource}.
+   *
+   * @param size the size of the {@link Resource}
+   */
+  public void setSize(long size) {
+    this.size = size;
   }
 
   /**

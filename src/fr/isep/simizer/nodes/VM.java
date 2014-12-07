@@ -308,10 +308,11 @@ public class VM extends Node implements IEventProducer {
         cache.write(res);
         break;
       case WRITE:
+        // change the size
+        res.setSize(task.getSize());
         cache.write(res);
         disk.write(res);
-        break;
-      case MODIFY:
+      case MODIFY:  // automatically fall through; we want to mark as modified
         cache.modify(res);
         disk.modify(res);
         break;
@@ -441,40 +442,28 @@ public class VM extends Node implements IEventProducer {
     /**
      * Adds a write {@code Task} to the {@code TaskSession}.
      * <p>
-     * If the Resource already exists on the local disk, it is modified.
+     * Writing a file is the equivalent of completely replacing it on the disk.
+     * When using this method, the size of the file will be changed and the
+     * version number will be incremented.
      *
-     * @param resource
-     * @param size
-     * @return 0 if created, -1 if failure to write (eg. not enough space).
+     * @param resource the {@link Resource} to write to the disk
+     * @param size the size that the {@link Resource} should be after the
+     *            writing is complete
      */
-    public int write(Resource resource, long size) {
-      if (disk.getUsedSpace() + size > disk.getCapacity()) {
-        return -1;
-      }
-
+    public void write(Resource resource, long size) {
       session.addTask(new DiskTask(VM.this, size, resource, IOType.WRITE));
-      return 0;
     }
 
     /**
      * Adds a modify task to the {@code TaskSession}.
      *
      * @param resourceId the ID of the {@link Resource} to modify
-     * @param size the size after modification
-     * @return the version number of the resource (this will be 0 if it was just
-     *         created), or -1 to indicate some sort of failure
+     * @param size the number of bytes to modify in the file.  This allows for
+     *            part of the file to be overwritten, but it will not chagne the
+     *            overall size of the file.
      */
-    public int modify(Integer resourceId, long size) {
-      if (!disk.contains(resourceId)) {
-        return -1;
-      }
-      Resource res = disk.read(resourceId);
-      if (disk.getUsedSpace() + (size - res.size()) > disk.getCapacity()) {
-        return -1;
-      }
-
-      session.addTask(new DiskTask(VM.this, size, res, IOType.MODIFY));
-      return res.getVersion() + 1;
+    public void modify(Integer resourceId, long size) {
+      session.addTask(new DiskTask(VM.this, size, disk.read(resourceId), IOType.MODIFY));
     }
 
     /**
@@ -486,11 +475,9 @@ public class VM extends Node implements IEventProducer {
      *            ProcTask}
      * @param resources the IDs of the {@link Resource}s needed to complete the
      *            {@link ProcTask}
-     * @return zero, always
      */
-    public int execute(long nbInstructions, long memSize, List<Resource> resources) {
+    public void execute(long nbInstructions, long memSize, List<Resource> resources) {
       session.addTask(new ProcTask(nbInstructions, memSize));
-      return 0;
     }
 
     /**

@@ -131,28 +131,41 @@ public class StorageElement {
   }
 
   /**
-   * Saves the {@code Resource}, modifying it or creating it if it doesn't exist.
+   * Saves the {@code Resource}, exactly as the parameter appears.
+   * <p>
+   * This method will <strong>not</strong> update the version number of the
+   * {@link Resource}.  If that is the intended behavior, the calling code
+   * should either (a) do that itself before calling this method or (b) use the
+   * {@link #modify(Resource)} method instead.
    *
    * @param resource the {@link Resource} to save
-   * @return true if the {@link Resource} could be saved, false if an error
+   * @return true if the {@link Resource} was be saved, false if an error
    *         occurred (such as not having enough free space)
    */
   public boolean write(Resource resource) {
-    // try to modify the file first, and if that fails, create it
-    if (!modify(resource)) {
-      if (resource.size() > getFreeSpace()) {
-        return false;
-      }
-
-      storage.put(resource.getId(), resource);
-      used += resource.size();
+    // check if there is enough space
+    long requiredSpace = resource.size();  // need enough space for resource
+    if (contains(resource.getId())) {
+      requiredSpace -= read(resource.getId()).size();  // can reuse this space
     }
+    if (requiredSpace > getFreeSpace()) {
+      return false;  // there isn't enough space available for the change
+    }
+
+    // we have enough space, so make the change
+    // we create a copy so that the calling code can't access our internal state
+    storage.put(resource.getId(), new Resource(resource));
+    
+    // update the used space by using the delta between the resources
+    used += requiredSpace;
 
     return true;  // getting this far means that we could change the resource
   }
 
   /**
    * Modifies the specified {@code Resource}.
+   * <p>
+   * Note that this does not affect the size of the {@link Resource}.
    *
    * @param resource the {@link Resource} to modify
    * @return true if the {@link Resource} was successfully modified, false if

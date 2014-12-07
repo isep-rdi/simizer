@@ -116,18 +116,14 @@ public class StorageElement {
    * <p>
    * There is no delay or simulation logic imposed by this method.  It will
    * immediately return the current version of the {@link Resource} for use.
-   * <p>
-   * Note that this does not return a copy of the {@link Resource}, but rather a
-   * reference to the {@link Resource}.  If changes are made (such as saving a
-   * modification), they will be reflected in the value previously returned by
-   * this method.
    *
    * @param resourceId the ID of the {@link Resource} to read
    * @return the {@link Resource}, or null if this storage does not contain a
    *             {@link Resource} with that ID
    */
   public Resource read(Integer resourceId) {
-    return storage.get(resourceId);
+    Resource internal = storage.get(resourceId);
+    return (internal != null) ? (new Resource(internal)) : null;
   }
 
   /**

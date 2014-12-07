@@ -2,6 +2,7 @@ package fr.isep.simizer.storage;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,6 +18,31 @@ public class StorageElementTest {
   @Before
   public void setUp() {
     storage = new StorageElement(StorageElement.KILOBYTE, 10);
+  }
+
+  /**
+   * Tests for the resource reading functionality.
+   * <p>
+   * The key here is that modifying the values returned by this function should
+   * not modify those values on the disk.
+   */
+  @Test
+  public void testRead() {
+    Resource toStore = new Resource(1, StorageElement.KILOBYTE);
+    assertTrue("should be able to write the Resource", storage.write(toStore));
+
+    // read the Resource and make changes
+    Resource read = storage.read(toStore.getId());
+    assertTrue("should get a value for the Resource", read != null);
+    read.setSize(StorageElement.MEGABYTE);
+    read.modify();
+
+    Resource secondRead = storage.read(toStore.getId());
+    assertTrue("should get a value for the Resource", secondRead != null);
+    assertEquals("the size should not have changed",
+            StorageElement.KILOBYTE, secondRead.size());
+    assertEquals("the version should not have changed",
+            0, secondRead.getVersion());
   }
 
   /**

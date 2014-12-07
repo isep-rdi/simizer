@@ -1,3 +1,39 @@
+v0.9.3
+======
+_08 Dec 2014_
+
+This update makes the final changes necessary to complete the five tutorials.
+
+Specific changes made in this release include:
+
+- Refactoring the `simizer` packages to be `fr.isep.simizer`.  This is to follow
+  the recommended naming convention for Java packages.
+
+- Updated documentation.  This includes some fixes to existing documentation
+  (including fixing broken links and incorrectly implemented links).
+
+- Use `long` for sizes.  Some places were using `int` and some were using
+  `long`.  To be consistent and to avoid the introduction of bugs by casting
+  values, all of the sizes should use `long`.
+
+- Fixed the implementation of `write()` and `modify()`.  The former will change
+  the size of the resource, but the latter will only adjust the version.  This
+  distinction is important to note in the comments since it is possible to only
+  modify part of a file.  When doing so, it needs to be obvious that the size of
+  the file will not change.
+
+- When interacting with `StorageElement`s, the resources are stored as copies.
+  This avoids the problem where a user application inadvertently modifies the
+  copy of a resource that is stored on the disk.
+
+- The notion of reusing `ClientNode` objects was removed from the
+  `ClientGenerator`.  Given that memory isn't necessarily a concern right now,
+  the added complication is not required.  In addition, this was resulting in
+  the reuse of Node IDs, which made the output much more difficult to read.
+
+There were also some general improvements made to remove unnecessary code.
+
+
 v0.9.2
 ======
 _03 Dec 2014_

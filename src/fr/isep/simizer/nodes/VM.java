@@ -20,6 +20,7 @@ import fr.isep.simizer.storage.IOController;
 import fr.isep.simizer.storage.IOType;
 import fr.isep.simizer.storage.Resource;
 import fr.isep.simizer.storage.StorageElement;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,189 @@ import java.util.Map;
  * @author slefebvr
  */
 public class VM extends Node implements IEventProducer {
+	
+	  /**
+	   * Handles the scheduling of tasks to complete a request/operation.
+	   * <p>
+	   * As I was working with the framework, I found it slightly confusing to know
+	   * which methods would add an operation to the {@link TaskSession} and which
+	   * ones wouldn't.  Most of the ones here did, but it wasn't necessarily all
+	   * of them (for example, see {@link #send(Request, MessageReceiver, long)}).
+	   * To combat this problem, I added a class where <strong>all</strong> of the
+	   * methods add an operation with a {@link Task}.  This instance is passed to
+	   * the various handlers so that they can construct the {@link TaskSession}.
+	   * <p>
+	   * In addition, there are a fair number of methods throughout the application
+	   * that have very similar (or the same) names.  This will hopefully help to
+	   * distinguish some of them.  For example, when you use {@code
+	   * scheduler.read()}, it should be obvious that its doing the same thing as
+	   * the {@code read()} method, but with the assistance of the {@code
+	   * scheduler}.
+	   */
+	  public class TaskScheduler {
+	    private final TaskSession session;
+
+	    /**
+	     * Initializes an instance of {@code TaskScheduler} for this {@code VM}.
+	     */
+	    public TaskScheduler() {
+	      this.session = new TaskSession(0);
+	    }
+
+	    private TaskSession getTaskSession() {
+	      return session;
+	    }
+
+	    /**
+	     * Returns the {@code VM} for this {@code TaskScheduler}.
+	     *
+	     * @return the {@code VM} for this {@code TaskScheduler}
+	     */
+	    public VM getVM() {
+	      return VM.this;
+	    }
+
+	    /**
+	    * Adds a read {@code Task} to the {@code TaskSession}.
+	    *
+	    * @param resourceId the ID of the resource to read
+	    * @param size the number of bytes to read.  This parameter does not need to
+	    *            be equal to the size of the file.  If it is less than the size
+	    *            of the file, it implies that only part of the file is being
+	    *            read.
+	    * @return the {@link Resource} if the operation is successful, null if it
+	    *         fails
+	    */
+	    public Resource read(Integer resourceId, long size) {
+	      Resource res = disk.read(resourceId);
+	      if (res != null) {
+	        session.addTask(new DiskTask(VM.this, size, res, IOType.READ));
+	      }
+	      return res;
+	    }
+
+	    /**
+	    * Adds a read {@code Task} to the {@code TaskSession}.
+	    * <p>
+	    * This method simulates reading the entire {@link Resource} from the disk.
+	    *
+	    * @param resourceId the ID of the resource to read
+	    * @return the {@link Resource} if the operation is successful, null if it
+	    *         fails
+	    */
+	    public Resource read(Integer resourceId) {
+	     Resource res = disk.read(resourceId);
+	     if (res != null) {
+	       return read(resourceId, res.size());
+	     } else {
+	       return null;
+	     }
+	    }
+
+	    /**
+	     * Adds a write {@code Task} to the {@code TaskSession}.
+	     * <p>
+	     * Writing a file is the equivalent of completely replacing it on the disk.
+	     * When using this method, the size of the file will be changed and the
+	     * version number will be incremented.
+	     *
+	     * @param resource the {@link Resource} to write to the disk
+	     * @param size the size that the {@link Resource} should be after the
+	     *            writing is complete
+	     */
+	    public void write(Resource resource, long size) {
+	      session.addTask(new DiskTask(VM.this, size, resource, IOType.WRITE));
+	    }
+
+	    /**
+	     * Adds a modify task to the {@code TaskSession}.
+	     *
+	     * @param resourceId the ID of the {@link Resource} to modify
+	     * @param size the number of bytes to modify in the file.  This allows for
+	     *            part of the file to be overwritten, but it will not chagne the
+	     *            overall size of the file.
+	     */
+	    public void modify(Integer resourceId, long size) {
+	      session.addTask(new DiskTask(VM.this, size, disk.read(resourceId), IOType.MODIFY));
+	    }
+
+	    /**
+	     * Adds a processing {@code Task} to the {@code TaskSession}.
+	     *
+	     * @param nbInstructions the number of instructions needed to complete the
+	     *            {@link ProcTask}
+	     * @param memSize the amount of memory needed to complete the {@link
+	     *            ProcTask}
+	     * @param resources the IDs of the {@link Resource}s needed to complete the
+	     *            {@link ProcTask}
+	     */
+	    public void execute(long nbInstructions, long memSize, List<Resource> resources) {
+	      session.addTask(new ProcTask(nbInstructions, memSize));
+	    }
+
+	    /**
+	     * Starts a requesting session, adding a send task to {@code TaskSession}.
+	     * <p>
+	     * Using this method waits for an answer before continuing to the next task
+	     * in the session (sshhh... no it doesn't).  Request handling should return
+	     * after calling this method.  (This needs to be updated depending on what
+	     * the requirements are.)
+	     *
+	     * @param destination where the {@link Request} should be sent
+	     * @param request the {@link Request} to send
+	     * @return whether or not the {@link Request} could be sent to the specified
+	     *         {@link Node}
+	     */
+	    public boolean sendRequest(Node destination, Request request) {
+	      if (getNetwork().getNode(destination.getId()) != null) {
+	        session.addTask(new SendTask(request, destination, VM.this));
+	        return true;
+	      }
+	      return false;
+	    }
+
+	    /**
+	     * Sends back a response to a request.
+	     * <p>
+	     * Completes the current {@link TaskSession}.  Request handling should
+	     * return after calling this method.  (This needs to be updated with the
+	     * actual behavior of the application.)
+	     *
+	     * @param request the {@link Request} (or rather, response) to send
+	     * @param destination the {@link Node} where the {@link Request} should be
+	     *            sent
+	     * @return returns false if the {@link Request} cannot be sent to the
+	     *         specified {@link Node} OR if the {@link Request} is not in its
+	     *         "response" state.  (Meaning that the {@link Request} should have
+	     *         already been sent by the client.)
+	     */
+	    public boolean sendResponse(Request request, Node destination) {
+	      if (getNetwork().getNode(destination.getId()) == null || request.getClientStartTimestamp() < 0) {
+	        return false;
+	      }
+
+	      // target node exists and request is valid
+	      session.addTask(new SendTask(request, destination, VM.this));
+
+	      return true;
+	    }
+
+	    /**
+	     * Sends a {@code Request} without waiting for a response.
+	     * <p>
+	     * This needs to be updated once the intended behavior is determined and
+	     * implemented.  However, given the implementation of this method, I suspect
+	     * that the intended behavior was never fully implemented.
+	     * 
+	     * @param node the {@link Node} where the {@link Request} should be sent
+	     * @param request the {@link Request} to send
+	     * @return whether or not {@code request} could be sent to {@code node}
+	     */
+	    public boolean sendOneWay(Node node, Request request) {
+	      return sendRequest(node, request);
+	    }
+
+	  }
 
   /** Used to conform to the {@code IEventProducer} protocol. */
   private final EventProducer eventProducer = new EventProducer();
@@ -174,8 +358,12 @@ public class VM extends Node implements IEventProducer {
    * will be started when the {@code VM} is started.
    *
    * @param application the {@link Application} to deploy
+ * @throws Exception 
    */
-  public void deploy(Application application) {
+  public void deploy(Application application) throws Exception {
+	if(application.getMemorySize() + memoryUsed >= this.memorySize) {
+		throw new Exception("Not enough memory to deploy app :" + application.getId());
+	}
     idToApp.put(application.getId(), application);
     memoryUsed += application.getMemorySize();
     if (started) {
@@ -361,188 +549,7 @@ public class VM extends Node implements IEventProducer {
     this.clock = timestamp;
   }
 
-  /**
-   * Handles the scheduling of tasks to complete a request/operation.
-   * <p>
-   * As I was working with the framework, I found it slightly confusing to know
-   * which methods would add an operation to the {@link TaskSession} and which
-   * ones wouldn't.  Most of the ones here did, but it wasn't necessarily all
-   * of them (for example, see {@link #send(Request, MessageReceiver, long)}).
-   * To combat this problem, I added a class where <strong>all</strong> of the
-   * methods add an operation with a {@link Task}.  This instance is passed to
-   * the various handlers so that they can construct the {@link TaskSession}.
-   * <p>
-   * In addition, there are a fair number of methods throughout the application
-   * that have very similar (or the same) names.  This will hopefully help to
-   * distinguish some of them.  For example, when you use {@code
-   * scheduler.read()}, it should be obvious that its doing the same thing as
-   * the {@code read()} method, but with the assistance of the {@code
-   * scheduler}.
-   */
-  public class TaskScheduler {
-    private final TaskSession session;
 
-    /**
-     * Initializes an instance of {@code TaskScheduler} for this {@code VM}.
-     */
-    public TaskScheduler() {
-      this.session = new TaskSession(0);
-    }
-
-    private TaskSession getTaskSession() {
-      return session;
-    }
-
-    /**
-     * Returns the {@code VM} for this {@code TaskScheduler}.
-     *
-     * @return the {@code VM} for this {@code TaskScheduler}
-     */
-    public VM getVM() {
-      return VM.this;
-    }
-
-    /**
-    * Adds a read {@code Task} to the {@code TaskSession}.
-    *
-    * @param resourceId the ID of the resource to read
-    * @param size the number of bytes to read.  This parameter does not need to
-    *            be equal to the size of the file.  If it is less than the size
-    *            of the file, it implies that only part of the file is being
-    *            read.
-    * @return the {@link Resource} if the operation is successful, null if it
-    *         fails
-    */
-    public Resource read(Integer resourceId, long size) {
-      Resource res = disk.read(resourceId);
-      if (res != null) {
-        session.addTask(new DiskTask(VM.this, size, res, IOType.READ));
-      }
-      return res;
-    }
-
-    /**
-    * Adds a read {@code Task} to the {@code TaskSession}.
-    * <p>
-    * This method simulates reading the entire {@link Resource} from the disk.
-    *
-    * @param resourceId the ID of the resource to read
-    * @return the {@link Resource} if the operation is successful, null if it
-    *         fails
-    */
-    public Resource read(Integer resourceId) {
-     Resource res = disk.read(resourceId);
-     if (res != null) {
-       return read(resourceId, res.size());
-     } else {
-       return null;
-     }
-    }
-
-    /**
-     * Adds a write {@code Task} to the {@code TaskSession}.
-     * <p>
-     * Writing a file is the equivalent of completely replacing it on the disk.
-     * When using this method, the size of the file will be changed and the
-     * version number will be incremented.
-     *
-     * @param resource the {@link Resource} to write to the disk
-     * @param size the size that the {@link Resource} should be after the
-     *            writing is complete
-     */
-    public void write(Resource resource, long size) {
-      session.addTask(new DiskTask(VM.this, size, resource, IOType.WRITE));
-    }
-
-    /**
-     * Adds a modify task to the {@code TaskSession}.
-     *
-     * @param resourceId the ID of the {@link Resource} to modify
-     * @param size the number of bytes to modify in the file.  This allows for
-     *            part of the file to be overwritten, but it will not chagne the
-     *            overall size of the file.
-     */
-    public void modify(Integer resourceId, long size) {
-      session.addTask(new DiskTask(VM.this, size, disk.read(resourceId), IOType.MODIFY));
-    }
-
-    /**
-     * Adds a processing {@code Task} to the {@code TaskSession}.
-     *
-     * @param nbInstructions the number of instructions needed to complete the
-     *            {@link ProcTask}
-     * @param memSize the amount of memory needed to complete the {@link
-     *            ProcTask}
-     * @param resources the IDs of the {@link Resource}s needed to complete the
-     *            {@link ProcTask}
-     */
-    public void execute(long nbInstructions, long memSize, List<Resource> resources) {
-      session.addTask(new ProcTask(nbInstructions, memSize));
-    }
-
-    /**
-     * Starts a requesting session, adding a send task to {@code TaskSession}.
-     * <p>
-     * Using this method waits for an answer before continuing to the next task
-     * in the session (sshhh... no it doesn't).  Request handling should return
-     * after calling this method.  (This needs to be updated depending on what
-     * the requirements are.)
-     *
-     * @param destination where the {@link Request} should be sent
-     * @param request the {@link Request} to send
-     * @return whether or not the {@link Request} could be sent to the specified
-     *         {@link Node}
-     */
-    public boolean sendRequest(Node destination, Request request) {
-      if (getNetwork().getNode(destination.getId()) != null) {
-        session.addTask(new SendTask(request, destination, VM.this));
-        return true;
-      }
-      return false;
-    }
-
-    /**
-     * Sends back a response to a request.
-     * <p>
-     * Completes the current {@link TaskSession}.  Request handling should
-     * return after calling this method.  (This needs to be updated with the
-     * actual behavior of the application.)
-     *
-     * @param request the {@link Request} (or rather, response) to send
-     * @param destination the {@link Node} where the {@link Request} should be
-     *            sent
-     * @return returns false if the {@link Request} cannot be sent to the
-     *         specified {@link Node} OR if the {@link Request} is not in its
-     *         "response" state.  (Meaning that the {@link Request} should have
-     *         already been sent by the client.)
-     */
-    public boolean sendResponse(Request request, Node destination) {
-      if (getNetwork().getNode(destination.getId()) == null || request.getClientStartTimestamp() < 0) {
-        return false;
-      }
-
-      // target node exists and request is valid
-      session.addTask(new SendTask(request, destination, VM.this));
-
-      return true;
-    }
-
-    /**
-     * Sends a {@code Request} without waiting for a response.
-     * <p>
-     * This needs to be updated once the intended behavior is determined and
-     * implemented.  However, given the implementation of this method, I suspect
-     * that the intended behavior was never fully implemented.
-     * 
-     * @param node the {@link Node} where the {@link Request} should be sent
-     * @param request the {@link Request} to send
-     * @return whether or not {@code request} could be sent to {@code node}
-     */
-    public boolean sendOneWay(Node node, Request request) {
-      return sendRequest(node, request);
-    }
-
-  }
 
   @Override
   public Channel getOutputChannel() {

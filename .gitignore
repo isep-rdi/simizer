@@ -7,3 +7,4 @@ nbproject/private/
 
 # Ignore system files.
 .DS_Store
+/bin/

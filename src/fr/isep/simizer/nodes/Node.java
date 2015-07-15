@@ -102,4 +102,9 @@ public abstract class Node implements MessageReceiver {
     onRequestReceived(m.getOrigin(), m.getRequest());
   }
 
+public String getMailBox() {
+	// TODO Auto-generated method stub
+	return null;
+}
+
 }

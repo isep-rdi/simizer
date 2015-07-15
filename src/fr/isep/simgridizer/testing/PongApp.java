@@ -12,10 +12,7 @@ public class PongApp extends Application {
 		super(id,memsize,host);
 	}
 	public PongApp(PongApp pongApp, Request req, String orig) throws HostNotFoundException {
-		this(pongApp.getId(),pongApp.getMemorySize(),pongApp.host);
-		this.req = req;
-		this.orig = orig;
-		
+		this(pongApp.getId(),pongApp.getMemorySize(),pongApp.getHost());
 	}
 
 	@Override
@@ -29,22 +26,10 @@ public class PongApp extends Application {
 		if(request.getAction().equals("ping")) {
 			request.set("response", "pong");
 			this.sendResponse(orig, request);
-		} 
+		}
 
 	}
 
-	@Override
-	public Application getInstance(String orig,Request req) {
-		
-		PongApp instance = null;
-			try {
-				instance = new PongApp(this,  req, orig);
-			} catch (HostNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		
-		return instance;
-	}
+	
 
 }

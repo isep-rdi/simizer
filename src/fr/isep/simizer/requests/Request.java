@@ -490,4 +490,9 @@ public class Request {
     return monVec;
   }
 
+public double getSize() {
+	// TODO Auto-generated method stub
+	return 0;
+}
+
 }

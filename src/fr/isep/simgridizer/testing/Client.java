@@ -1,12 +1,12 @@
 package fr.isep.simgridizer.testing;
 
 import org.simgrid.msg.Host;
+import org.simgrid.msg.HostFailureException;
 import org.simgrid.msg.HostNotFoundException;
 import org.simgrid.msg.Msg;
 import org.simgrid.msg.Process;
 
 import fr.isep.simgridizer.app.Application;
-import fr.isep.simgridizer.task.Server;
 import fr.isep.simizer.requests.Request;
 
 public class Client extends Process {
@@ -29,12 +29,7 @@ public class Client extends Process {
 				public void init() {}
 
 				@Override
-				public void handle(String orig, Request request) {		}
-
-				@Override
-				public Application getInstance(String orig,Request req) {
-					return null;
-				}
+				public void handle(String orig, Request request) {}
 				
 			};
 		} catch (HostNotFoundException e) {
@@ -60,16 +55,23 @@ public class Client extends Process {
 			
 			Request resp = dummyApp.sendRequest(targetAddr, toSend);
 			double end = Msg.getClock() - start;
+			
 			resp.setClientEndTimestamp(Math.round(end));
-			System.out.println("request ended in " + 
-					  end + " : " + 
-					  resp.getErrorCount() + " : " + 
-					  resp.get("response"));
+			
+			System.out.println("request " + i +
+								" ended in " + 
+								end + " : " + 
+								resp.getErrorCount() + " : " + 
+								resp.get("response"));
 			i++;
 		}
 		
 		Request stopRequest = new Request(targetApp,"stop", "",false);
 		dummyApp.sendOneWay(targetAddr, stopRequest);
+		
+		Request stopHPRequest = new Request(2, "stop","",false);
+		dummyApp.sendOneWay("host1", stopHPRequest);
+		
 		
 	}
 

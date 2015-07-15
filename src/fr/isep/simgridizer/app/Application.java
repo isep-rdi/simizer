@@ -5,6 +5,8 @@ import java.util.Properties;
 import org.simgrid.msg.Host;
 import org.simgrid.msg.HostFailureException;
 import org.simgrid.msg.HostNotFoundException;
+import org.simgrid.msg.Msg;
+import org.simgrid.msg.MsgException;
 import org.simgrid.msg.Process;
 import org.simgrid.msg.Task;
 import org.simgrid.msg.TaskCancelledException;
@@ -26,17 +28,15 @@ import fr.isep.simizer.requests.Request;
 public abstract class Application extends Process {
 
 	/** The ID of the {@code Application}. */
-	private final Integer id;
+	private Integer id;
 
 	/** The amount of memory used by this {@code Application}. */
-	private final long memorySize;
+	private long memorySize;
 
 	/** Contains user-specific properties for the {@code Application}. */
 	protected Properties config = new Properties();
 
-	protected Request req;
-
-	protected String orig;
+	private boolean running;
 	
 	/**
 	 * Initializes a new instance of the class.
@@ -51,7 +51,7 @@ public abstract class Application extends Process {
 		super(host,id.toString());
 		this.id = id;
 		this.memorySize = memorySize;
-		this.host = host;
+		
 	}
 
 	/**
@@ -66,14 +66,13 @@ public abstract class Application extends Process {
 	 *            the {@code Application} that should serve as a template when
 	 *            creating this one
 	 */
-	public Application(Application template, Host host, Request req, String orig) {
+	public Application(Application template, Host host) {
+		super(host, template.id.toString());
 		this.id = template.id;
 		this.memorySize = template.memorySize;
 		// TODO: I don't think we want to copy this as a reference.
 		this.config = template.config;
-		this.host = host;
-		this.req = req;
-		this.orig = orig;
+		
 	}
 
 	/**
@@ -106,9 +105,7 @@ public abstract class Application extends Process {
 		config.setProperty(key, value);
 	}
 
-	public void setHost(Host host2) {
-		this.host = host2;
-	}
+	
 
 	/**
 	 * Call this to execute code
@@ -164,7 +161,7 @@ public abstract class Application extends Process {
 		SimizerTask response = null;
 
 		try {
-			response = (SimizerTask) SimizerTask.receive(host.getName() + ":"
+			response = (SimizerTask) SimizerTask.receive(this.getHost().getName() + ":"
 					+ this.getId().toString() + ":" + request.getId());
 		} catch (TransferFailureException | HostFailureException
 				| TimeoutException e) {
@@ -230,19 +227,47 @@ public abstract class Application extends Process {
 
 		String mailbox = target + ":"	+ request.getApplicationId().toString();
 		SimizerTask toSend = new SimizerTask(request);
-
-		try {
-			toSend.send(mailbox);
-		} catch (TransferFailureException | HostFailureException
-				| TimeoutException e) {
-			e.printStackTrace();
-			result = false;
-		}
+		Msg.info("Sending to:" + mailbox);
+		toSend.isend(mailbox);
+		
 		return result;
 	}
-
+	protected boolean getRunning() {
+		return this.running;
+	}
 	public void main(String[] args) {
-		handle(this.orig, this.req);
+		this.running = true;
+		init();
+		String mailbox = this.getHost().getName() + ":" + getId().toString();
+		Msg.info("Starting on " + this.getHost().getName() + " listening to " + mailbox);
+
+		while (running) {
+			SimizerTask task;
+			try {
+				task = (SimizerTask) Task.receive(mailbox);
+				Host orig = task.getSource();
+				Request req = task.getRequest();
+				
+				if (req.getAction().equals("stop")) {
+					stop();
+				}
+				else {
+					handle(orig.getName(), req);
+				}
+			} catch (MsgException e) {
+				Msg.debug("Received failed. I'm done. See you!");
+				break;
+			}
+
+		}
+		
+	
+	}
+	
+
+	public void stop() {
+		this.running = false;
+		
 	}
 
 	/**
@@ -274,13 +299,6 @@ public abstract class Application extends Process {
 	 */
 	public abstract void handle(String orig, Request request);
 
-	/**
-	 * Must return an instance of the same application, via a copy constructor
-	 * @param orig 
-	 * 
-	 * @return
-	 */
-	public abstract Application getInstance(String orig, Request req);
 
 	
 

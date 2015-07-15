@@ -15,7 +15,9 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 /**
- *
+ *  Has access to
+ * StorageElement's resources (for reading and writing) Implements a (kind of)
+ * page caching, and swaps overflowing contents.
  * @author slefebvr
  */
 public class ProcessingUnit2 extends TaskProcessor {
@@ -101,6 +103,7 @@ public class ProcessingUnit2 extends TaskProcessor {
             vmInstance.endTaskSession(ts, timestamp);
         else
             t.startTask(vmInstance, timestamp);
+        
     }
     /**
      * Updates instructions of all the running tasks. 

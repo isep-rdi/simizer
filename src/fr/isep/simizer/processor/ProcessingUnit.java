@@ -13,9 +13,7 @@ import java.util.Map;
 
 /**
  * Processor Default class for simizer. Provides performance model for
- * Instructions-Based request execution, read and write tasks. Has access to
- * StorageElement's resources (for reading and writing) Implements a (kind of)
- * page caching, and swaps overflowing contents.
+ * Instructions-Based request execution, read and write tasks.
  *
  * Tries to mimick the CFS scheduler.
  *

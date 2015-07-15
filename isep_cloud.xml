@@ -1,0 +1,21 @@
+<?xml version='1.0'?>
+<!DOCTYPE platform SYSTEM "http://simgrid.gforge.inria.fr/simgrid.dtd">
+<platform version="3">
+  <AS  id="AS0"  routing="Full">
+    <cluster id="cirrus" prefix="cirrus-" suffix=".isep.fr" radical="0-3" core="16" power="1e9" bw="125e6" lat="5E-5">
+      <prop id="ramsize" value="64Gb"/>
+    </cluster>
+    
+    <cluster id="cumulus" prefix="cumulus-" suffix=".isep.fr" radical="0-2" core="8" power="1e9" bw="125e6" lat="5E-5" bb_bw="2.25e9" bb_lat="5E-4">
+      <prop id="ramsize" value="28Gb"/>
+    </cluster>
+
+    	<link id="backbone" bandwidth="1.25GBps" latency="500us" />
+	<!-- router_name = prefix + clusterId + _router + suffix;
+	cirrus-cirrus_router -->
+	<ASroute src="cirrus" dst="cumulus" gw_src="cirrus-cirrus_router.isep.fr" gw_dst="cumulus-cumulus_router.isep.fr">
+	  <link_ctn id="backbone" />
+	</ASroute>
+  </AS>
+  
+</platform>

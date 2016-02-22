@@ -329,6 +329,7 @@ public class VM extends Node implements IEventProducer {
    */
   public void commitSendTask(SendTask task) {
     // TODO: Decrement the number of active requests.
+	 // this.activeRequestCount--;
   }
 
   /**

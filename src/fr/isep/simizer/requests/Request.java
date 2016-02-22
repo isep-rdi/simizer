@@ -398,6 +398,15 @@ public class Request {
       return null;
     }
   }
+  
+  /** 
+   * Changes the target application id, which useful or request/responses
+   * protocols.
+   * @param appId
+   */
+  public void setAppId(Integer appId) {
+	  this.applicationId = appId;
+  }
 
   /** @deprecated @param nId */
   public void setNode(int nId) {

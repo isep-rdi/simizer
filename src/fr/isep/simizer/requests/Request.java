@@ -29,6 +29,11 @@ public class Request {
    * The ID of the {@code Application} that should handle the {@code Request}.
    */
   protected Integer applicationId;
+  
+  /**
+   * The ID of the {@code Application} that sent the {@code Request}
+   */
+  protected Integer senderId;
 
   /** The action that the {@code Application} should perform. */
   protected String action;
@@ -407,7 +412,14 @@ public class Request {
   public void setAppId(Integer appId) {
 	  this.applicationId = appId;
   }
+  
+  public void setSenderId(Integer appId) {
+	  this.senderId = appId;
+  }
 
+  public Integer getSenderId() {
+	  return this.senderId;
+  }
   /** @deprecated @param nId */
   public void setNode(int nId) {
     this.node = nId;

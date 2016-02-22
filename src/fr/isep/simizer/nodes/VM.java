@@ -228,8 +228,10 @@ public class VM extends Node implements IEventProducer {
     Application app = idToApp.get(request.getApplicationId());
 
     TaskScheduler scheduler = this.new TaskScheduler();
-    if (app == null) {
+    
+    if (app == null) { // reverses destination app to avoid infinite request back and forth.
       request.reportErrors(1);
+      request.setAppId(request.getSenderId());
       scheduler.sendResponse(request, source);
     } else {
       app.handle(scheduler, source, request);

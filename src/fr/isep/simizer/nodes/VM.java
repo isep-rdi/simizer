@@ -101,8 +101,7 @@ public class VM extends Node implements IEventProducer {
    * @param memory the amount of memory in the system
    * @param hCost the hourly cost for using the system
    */
-  public VM(ProcessingUnit processor, StorageElement disk, long memory,
-      double hCost) {
+  public VM(ProcessingUnit processor, StorageElement disk, long memory,    double hCost) {
 
     super();
 

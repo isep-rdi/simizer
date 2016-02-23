@@ -222,7 +222,7 @@ public class ClientNode extends Node {
       }
     }
 
-    if (!ended) {
+    if (!ended && timestamp > this.startTime) {
       scheduleNextRequest(timestamp);
     }
   }

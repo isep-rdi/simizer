@@ -20,12 +20,14 @@ import fr.isep.simizer.requests.RequestPrinter;
  *
  * @author Sylvain Lefebvre
  */
+
+// TODO refactor to be more usable for inheriting classes.
 public class ClientNode extends Node {
 
-  private static Law requestLaw;
-  private static Law thinkTimeLaw;
+  protected static Law requestLaw;
+  protected static Law thinkTimeLaw;
   private static Law durationLaw;
-  private static RequestFactory requestFactory;
+  protected static RequestFactory requestFactory;
 
   /**
    * Sets the {@code RequestFactory} used by the clients.
@@ -53,7 +55,7 @@ public class ClientNode extends Node {
   }
 
   /** The printer used to format the output of the simulation. */
-  private static RequestPrinter printer = new PrettyRequestPrinter(System.out);
+  protected static RequestPrinter printer = new PrettyRequestPrinter(System.out);
 
   /**
    * Sets the {@code RequestPrinter} used to output the results.
@@ -69,7 +71,7 @@ public class ClientNode extends Node {
   }
 
   /** The timestamp when the client starts its execution. */
-  private long startTime;
+  protected long startTime;
 
   /**
    * The timestamp when the client should finish its execution.
@@ -77,16 +79,16 @@ public class ClientNode extends Node {
    * This value only has significance when {@code requestsToSend} is {@code
    * null}.
    */
-  private long endTime;
+  protected long endTime;
 
   /** Whether or not the client has finished its execution. */
   private boolean ended = false;
 
   /** The number of requests sent by the client. */
-  private int requestCount;
+  protected int requestCount;
 
   /** The number of requests that the client should send before terminating. */
-  private Integer requestsToSend = null;
+  protected Integer requestsToSend = null;
 
   /** The address where the client should send its requests. */
   protected MessageReceiver serviceAddress;
@@ -159,7 +161,7 @@ public class ClientNode extends Node {
    * @return whether or not the client has finished
    */
   public boolean getEnded() {
-    return this.ended;
+    return this.isEnded();
   }
 
   /**
@@ -213,16 +215,16 @@ public class ClientNode extends Node {
     if (requestsToSend != null) {
       // if the number of requests to send is set, use that method
       if (requestCount >= requestsToSend) {
-        ended = true;
+        setEnded(true);
       }
     } else {
       // otherwise, we want to rely on the calculated endTime
       if (timestamp >= endTime) {
-        ended = true;
+        setEnded(true);
       }
     }
 
-    if (!ended && timestamp > this.startTime) {
+    if (!isEnded() && timestamp > this.startTime) {
       scheduleNextRequest(timestamp);
     }
   }
@@ -231,5 +233,13 @@ public class ClientNode extends Node {
   public void onRequestReceived(Node orig, Request r) {
     throw new UnsupportedOperationException("Not supported yet.");
   }
+
+public boolean isEnded() {
+	return ended;
+}
+
+public void setEnded(boolean ended) {
+	this.ended = ended;
+}
 
 }

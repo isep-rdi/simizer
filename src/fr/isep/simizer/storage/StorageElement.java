@@ -123,7 +123,8 @@ public class StorageElement {
    */
   public Resource read(Integer resourceId) {
     Resource internal = storage.get(resourceId);
-    return (internal != null) ? (new Resource(internal)) : null;
+    return internal;
+    //return (internal != null) ? (new Resource(internal)) : null;
   }
 
   /**
